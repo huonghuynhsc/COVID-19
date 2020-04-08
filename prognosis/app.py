@@ -66,7 +66,7 @@ if st.checkbox('Show Datasource'):
 if st.checkbox('About the model'):
     st.subheader('Assumptions')
     st.markdown('''
-            Number of DEATH is the most accurate metric coming out of other countries.
+            Number of **DEATH** is the most accurate metric. 
             It will be used to project other metrics under these assumptions for Covid19:  
             The overall case fatality rate: 1 percent  
             Patients need ICU: 5 percent (critical)  
@@ -122,6 +122,8 @@ if st.checkbox('About the model'):
     st.markdown('''
             Implications are observed in data everywhere:  
             
+            
+            0. ***Do not use only confirmed case to make decision***. It is misleading and distorted by testing capicity
             1. Country with severe testing constraint will see death rate lurking around 10-15%, 
             which is 1% death/15%hospitalized. E.g. Italy, Spain, Iran at the beginning. 
             While country with enough testing for all symptomatic patients see rate less than 5% (1%/20%).
@@ -145,6 +147,6 @@ if st.checkbox('About the model'):
 
 if st.checkbox('References'):
     st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19?source=history_widget')
-    st.markdown('https://covid19.healthdata.org Reason I speed up my development. Lots of thing I like. One thing I would '
-                'do differently, the forecasting model.')
+    st.markdown('https://covid19.healthdata.org Reason we speed up our development. Lots of thing to like. One thing '
+                'we would do differently, the forecasting model.')
     st.markdown('https://www.streamlit.io Fast prototype.')
