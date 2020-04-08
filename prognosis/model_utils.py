@@ -4,7 +4,7 @@ import numpy as np
 import datetime as dt
 from sklearn import linear_model
 import streamlit as st
-
+import pwlf
 
 DEATH_RATE = 0.01
 ICU_RATE = 0.05
@@ -154,7 +154,7 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
-    #log_daily_death.dropna(inplace=True)
+    # log_daily_death.dropna(inplace=True)
     data_start_date = min(local_death_data.index)
     data_end_date = max(local_death_data.index)
     forecast_end_date = data_end_date + dt.timedelta(forecast_horizon)
@@ -163,68 +163,56 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
         lockdown_date = pd.to_datetime(lockdown_date)
     else:
         lockdown_date = forecast_end_date
-    lockdown_effective_date = lockdown_date + dt.timedelta(INFECT_2_HOSPITAL_TIME+HOSPITAL_2_ICU_TIME+ICU_2_DEATH_TIME)
+    lockdown_effective_date = lockdown_date + dt.timedelta(
+        INFECT_2_HOSPITAL_TIME + HOSPITAL_2_ICU_TIME + ICU_2_DEATH_TIME)
+    data_start_date_idx = (data_start_date - lockdown_effective_date).days
     data_end_date_idx = (data_end_date - lockdown_effective_date).days
     forecast_end_date_idx = data_end_date_idx + forecast_horizon
     forecast_time_idx = (forecast_date_index - lockdown_effective_date).days.values
     data_time_idx = (log_daily_death.index - lockdown_effective_date).days.values
     log_daily_death['time_idx'] = data_time_idx
     log_daily_death = log_daily_death.replace([np.inf, -np.inf], np.nan).dropna()
-    log_daily_death_before = log_daily_death[log_daily_death.time_idx<0]
+    log_daily_death_before = log_daily_death[log_daily_death.time_idx < 0]
     regr_before = linear_model.HuberRegressor(fit_intercept=True)
     regr_before.fit(log_daily_death_before.time_idx.values.reshape(-1, 1), log_daily_death_before.death)
-    log_predicted_death_before_values = regr_before.predict(forecast_time_idx[forecast_time_idx<0].reshape(-1, 1))
-    log_predicted_death_before_index = forecast_date_index[forecast_time_idx<0]
-    log_predicted_death_before = pd.DataFrame(log_predicted_death_before_values, 
+    log_predicted_death_before_values = regr_before.predict(forecast_time_idx[forecast_time_idx < 0].reshape(-1, 1))
+    log_predicted_death_before_index = forecast_date_index[forecast_time_idx < 0]
+    log_predicted_death_before = pd.DataFrame(log_predicted_death_before_values,
                                               index=log_predicted_death_before_index)
-    log_predicted_death_before.columns = ['predicted_death_before_lockdown_effective']
- 
-    log_daily_death_after = log_daily_death[log_daily_death.time_idx>=0]
-    regr_after = linear_model.HuberRegressor(fit_intercept=True)
-    if all(data_time_idx<0):
-        print("Use default model due to no data")
-        regr_after.coef_ = np.array([-0.04])
-        regr_after.intercept_ = log_predicted_death_before.iloc[-1,0]
-    else:
-        regr_after.fit(log_daily_death_after.time_idx.values.reshape(-1, 1), log_daily_death_after.death)
-    #print("After Coef: {}".format(regr_after.coef_))
-    if all(forecast_time_idx<0):
+    if all(forecast_time_idx < 0):
         print("Lockdown is not effective in forecast range. Second model not needed")
         log_predicted_death_after = None
+    elif all(data_time_idx <= 1):
+        print("Use default second model due to no data")
+        regr_after = linear_model.HuberRegressor(fit_intercept=True)
+        regr_after.coef_ = np.array([-0.04])
+        regr_after.intercept_ = log_predicted_death_before.iloc[-1, 0]
+        log_predicted_death_after_values = regr_after.predict(forecast_time_idx[forecast_time_idx >= 0].reshape(-1, 1))
+        log_predicted_death_after_index = forecast_date_index[forecast_time_idx >= 0]
+        log_predicted_death_after = pd.DataFrame(log_predicted_death_after_values,
+                                                 index=log_predicted_death_after_index)
+        log_predicted_death = pd.concat([log_predicted_death_before, log_predicted_death_after], axis=0)
     else:
-        log_predicted_death_after_values = regr_after.predict(forecast_time_idx[forecast_time_idx>=0].reshape(-1, 1))
-        log_predicted_death_after_index = forecast_date_index[forecast_time_idx>=0]
-        log_predicted_death_after = pd.DataFrame(log_predicted_death_after_values, 
-                                                  index=log_predicted_death_after_index)
-        log_predicted_death_after.columns = ['predicted_death_after_lockdown_effective']
-    return log_predicted_death_before, log_predicted_death_after
+        regr_pw = pwlf.PiecewiseLinFit(x=log_daily_death.time_idx.values, y=log_daily_death.death)
+        break_points = np.array([data_start_date_idx, 0, data_end_date_idx])
+        regr_pw.fit_with_breaks(break_points)
+        log_predicted_death_values = regr_pw.predict(forecast_time_idx)
+        log_predicted_death = pd.DataFrame(log_predicted_death_values, index=forecast_date_index)
+
+    log_predicted_death.columns = ['predicted_death']
+    return log_predicted_death
 
 
 def get_daily_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None):
-    log_predicted_death_before, log_predicted_death_after = get_log_daily_predicted_death(local_death_data, 
-                                                                                          forecast_horizon, 
-                                                                                          lockdown_date)
-    
-    daily_predicted_death_before = np.exp(log_predicted_death_before).astype(int)
-    daily_predicted_death_before.columns = ['predicted_death']
-    if log_predicted_death_after is not None:
-        daily_predicted_death_after = np.exp(log_predicted_death_after).astype(int)
-        daily_predicted_death_after.columns = ['predicted_death']
-    else:
-        daily_predicted_death_after = None  
-    
-    daily_predicted_death = pd.concat([daily_predicted_death_before, daily_predicted_death_after], axis=0)
-    return daily_predicted_death, daily_predicted_death_before, daily_predicted_death_after 
+    return np.exp(get_log_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)).astype(int)
 
 
 def get_cumulative_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None):
-    daily_predicted_death, _, _ = get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)
-    return daily_predicted_death.cumsum()
+    return get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date).cumsum()
 
 
 def get_daily_metrics_from_death_data(local_death_data, forecast_horizon=60, lockdown_date=None):
-    daily_predicted_death, daily_predicted_death_before, _ = get_daily_predicted_death(local_death_data, 
-                                                                                    forecast_horizon, lockdown_date)
+    daily_predicted_death = get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     daily_infected_cases_new = get_infected_cases(daily_predicted_death)
@@ -237,7 +225,7 @@ def get_daily_metrics_from_death_data(local_death_data, forecast_horizon=60, loc
                       daily_infected_cases_new,
                       daily_symptomatic_cases_new,
                       daily_hospitalized_cases_new,
-                      daily_hospital_beds_need, 
+                      daily_hospital_beds_need,
                       daily_ICU_need], axis=1, sort=True)
 
 
@@ -275,64 +263,24 @@ def get_log_daily_predicted_death_by_country(country, forecast_horizon=60, lockd
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
-    #log_daily_death.plot(kind='bar', title="Log of daily death over time for {}".format(country))
-    log_predicted_death_before, log_predicted_death_after = get_log_daily_predicted_death(local_death_data, 
-                                                                                lockdown_date=lockdown_date)
-    return  pd.concat([log_daily_death, log_predicted_death_before, log_predicted_death_after],
-              axis=1).replace([np.inf, -np.inf], np.nan)
+    log_predicted_death = get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
+    return  pd.concat([log_daily_death, log_predicted_death], axis=1).replace([np.inf, -np.inf], np.nan)
 
-
-def plot_log_death_new_by_state_US(state, forecast_horizon=60, lockdown_date=None):
+def get_log_daily_predicted_death_by_state_US(state, forecast_horizon=60, lockdown_date=None):
     local_death_data = get_US_death_data_by_state(state)
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
-    log_predicted_death_before, log_predicted_death_after = get_log_daily_predicted_death(local_death_data, 
-                                                                                lockdown_date=lockdown_date)
-    pd.concat([log_daily_death, log_predicted_death_before, log_predicted_death_after], 
-              axis=1).plot(title="Log of daily death over time for {}".format(state))
+    log_predicted_death = get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
+    return  pd.concat([log_daily_death, log_predicted_death], axis=1).replace([np.inf, -np.inf], np.nan)
 
 
-def plot_log_death_new_by_county_and_state_US(county, state, forecast_horizon=60, lockdown_date=None):
+def get_log_daily_predicted_death_by_county_and_state_US(county, state, forecast_horizon=60, lockdown_date=None):
     local_death_data = get_US_death_data_by_county_and_state(county, state)
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
-    log_predicted_death_before, log_predicted_death_after = get_log_daily_predicted_death(local_death_data, 
-                                                                                lockdown_date=lockdown_date)
-    pd.concat([log_daily_death, log_predicted_death_before, log_predicted_death_after], 
-              axis=1).plot(title="Log of daily death over time for {}, {}".format(county, state))
+    log_predicted_death = get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
+    return  pd.concat([log_daily_death, log_predicted_death], axis=1).replace([np.inf, -np.inf], np.nan)
 
-
-def plot_metrics_by_country(country, forecast_horizon=60, lockdown_date=None, 
-                            metrics=['death', 'predicted_death', 'infected', 
-                                     'symptomatic', 'hospitalized', 'ICU', 'hospital_beds']):
-    plot_log_death_new_by_country(country, forecast_horizon, lockdown_date)
-    local_death_data = get_death_data_by_country(country)
-    daily_metrics = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    daily_metrics[metrics].plot(title="Daily metrics for country: {}".format(country))
-    cumulative_metrics = get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    cumulative_metrics[metrics].plot(title="Cumulative metrics for country: {}".format(country))
-    
-
-def plot_metrics_by_state_US(state, forecast_horizon=60, lockdown_date=None, 
-                            metrics=['death', 'predicted_death', 'infected', 
-                                     'symptomatic', 'hospitalized', 'ICU', 'hospital_beds']):
-    plot_log_death_new_by_state_US(state, forecast_horizon, lockdown_date)
-    local_death_data = get_US_death_data_by_state(state)
-    daily_metrics = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    daily_metrics[metrics].plot(title="Daily metrics for {}".format(state))
-    cumulative_metrics = get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    cumulative_metrics[metrics].plot(title="Cumulative metrics for {}".format(state))
-    
-
-def plot_metrics_by_county_and_state_US(county, state, forecast_horizon=60, lockdown_date=None, 
-                            metrics=['death', 'predicted_death', 'infected', 
-                                     'symptomatic', 'hospitalized', 'ICU', 'hospital_beds']):
-    plot_log_death_new_by_county_and_state_US(county, state, forecast_horizon, lockdown_date)
-    local_death_data = get_US_death_data_by_county_and_state(county, state)
-    daily_metrics = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    daily_metrics[metrics].plot(title="Daily metrics for {}, {}".format(county, state))
-    cumulative_metrics = get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    cumulative_metrics[metrics].plot(title="Cumulative metrics for {}, {}".format(county, state))
 

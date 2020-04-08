@@ -15,6 +15,7 @@ if scope=='Country':
     'You selected: ', country
     data_load_state = st.text('Forecasting...')
     try:
+        log_fit = get_log_daily_predicted_death_by_country(country, lockdown_date=lockdown_date)
         daily, cumulative = get_metrics_by_country(country, lockdown_date=lockdown_date)
     except ValueError:
         st.error('Not enough data to provide prognosis, please check input lockdown date')
@@ -27,6 +28,7 @@ else:
     'You selected: ', state
     data_load_state = st.text('Forecasting...')
     try:
+        log_fit = get_log_daily_predicted_death_by_state_US(state, lockdown_date=lockdown_date)
         daily, cumulative = get_metrics_by_state_US(state, lockdown_date=lockdown_date)
     except ValueError:
         st.error('Not enough data to provide prognosis, please check input lockdown date')
@@ -44,11 +46,15 @@ st.line_chart(cumulative[metrics])
 
 if st.checkbox('Show fitted log death'):
     st.subheader('Fitted log of daily death before and after lock down being effective')
-    log_fit = get_log_daily_predicted_death_by_country(country, lockdown_date=lockdown_date)
     st.line_chart(log_fit)
 #.plot(title="Log of daily death over time for {}".format(country))
 if st.checkbox('Show raw data'):
     st.subheader('Raw Data')
     st.write('Daily metrics', daily)
     st.write('Cumulative metrics', cumulative)
-
+if st.checkbox('Show authors'):
+    st.subheader('Authors')
+    st.markdown('Quoc Tran - Principal Data Scientist - WalmartLabs')
+    st.markdown('Huong Huynh - Data Scientist - Virtual Power Systems')
+if st.checkbox('Show Datasource'):
+    st.markdown('https://coronavirus.jhu.edu/map.html')
