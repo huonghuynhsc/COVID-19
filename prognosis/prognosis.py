@@ -278,7 +278,7 @@ def plot_log_death_new_by_country(country, forecast_horizon=60, lockdown_date=No
     #log_daily_death.plot(kind='bar', title="Log of daily death over time for {}".format(country))
     log_predicted_death_before, log_predicted_death_after = get_log_daily_predicted_death(local_death_data, 
                                                                                 lockdown_date=lockdown_date)
-    pd.concat([log_daily_death, log_predicted_death_before, log_predicted_death_after], 
+    return  pd.concat([log_daily_death, log_predicted_death_before, log_predicted_death_after],
               axis=1).plot(title="Log of daily death over time for {}".format(country))
 
 
