@@ -270,7 +270,7 @@ def get_metrics_by_county_and_state_US(county, state, forecast_horizon=60, lockd
     return daily_metrics, cumulative_metrics
 
 
-def plot_log_death_new_by_country(country, forecast_horizon=60, lockdown_date=None):
+def get_log_daily_predicted_death_by_country(country, forecast_horizon=60, lockdown_date=None):
     local_death_data = get_death_data_by_country(country)
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
@@ -279,7 +279,7 @@ def plot_log_death_new_by_country(country, forecast_horizon=60, lockdown_date=No
     log_predicted_death_before, log_predicted_death_after = get_log_daily_predicted_death(local_death_data, 
                                                                                 lockdown_date=lockdown_date)
     return  pd.concat([log_daily_death, log_predicted_death_before, log_predicted_death_after],
-              axis=1).plot(title="Log of daily death over time for {}".format(country))
+              axis=1).replace([np.inf, -np.inf], np.nan)
 
 
 def plot_log_death_new_by_state_US(state, forecast_horizon=60, lockdown_date=None):
