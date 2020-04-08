@@ -139,7 +139,7 @@ def get_number_ICU_need(daily_local_death_new):
         ICU_n = ICU_n.add(get_ICU_from_death(daily_local_death_new.iloc[i+1]), fill_value=0)
     return ICU_n
 
-
+@st.cache
 def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None):
     '''Since this is highly contagious disease. Daily new death, which is a proxy for daily new infected cases
     is model as d(t)=a*d(t-1) or equivalent to d(t) = b*a^(t). After a log transform, it becomes linear.
