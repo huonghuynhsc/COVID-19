@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import datetime as dt
 from sklearn import linear_model
+import streamlit as st
 
 
 DEATH_RATE = 0.01
@@ -15,12 +16,12 @@ ICU_2_DEATH_TIME = 5
 ICU_2_RECOVER_TIME = 11
 NOT_ICU_DISCHARGE_TIME = 7
 
-
+@st.cache
 def get_global_death_data(csv_file='../csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'):
     death_data = pd.read_csv(csv_file)
     return death_data.rename(index=str, columns={"Country/Region": "Country", "Province/State": "State"})
 
-
+@st.cache
 def get_US_death_data(csv_file='../csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv'):
     death_data = pd.read_csv(csv_file)
     return death_data.rename(index=str, columns={"Country_Region": "Country", 
