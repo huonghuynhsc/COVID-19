@@ -217,7 +217,7 @@ def get_daily_predicted_death(local_death_data, forecast_horizon=60, lockdown_da
     return daily_predicted_death, daily_predicted_death_before, daily_predicted_death_after 
 
 
-def get_cummulative_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None):
+def get_cumulative_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None):
     daily_predicted_death, _, _ = get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)
     return daily_predicted_death.cumsum()
 
@@ -241,33 +241,33 @@ def get_daily_metrics_from_death_data(local_death_data, forecast_horizon=60, loc
                       daily_ICU_need], axis=1, sort=True)
 
 
-def get_cummulative_metrics_from_death_data(local_death_data, forecast_horizon=60, lockdown_date=None):
+def get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon=60, lockdown_date=None):
     daily_metrics = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    cummulative_metrics = daily_metrics.cumsum()
-    cummulative_metrics['ICU'] = daily_metrics['ICU']
-    cummulative_metrics['hospital_beds'] = daily_metrics['hospital_beds']
-    return cummulative_metrics
+    cumulative_metrics = daily_metrics.cumsum()
+    cumulative_metrics['ICU'] = daily_metrics['ICU']
+    cumulative_metrics['hospital_beds'] = daily_metrics['hospital_beds']
+    return cumulative_metrics
 
 
 def get_metrics_by_country(country, forecast_horizon=60, lockdown_date=None):
     local_death_data = get_death_data_by_country(country)
     daily_metrics = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    cummulative_metrics = get_cummulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    return daily_metrics, cummulative_metrics
+    cumulative_metrics = get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
+    return daily_metrics, cumulative_metrics
 
 
 def get_metrics_by_state_US(state, forecast_horizon=60, lockdown_date=None):
     local_death_data = get_US_death_data_by_state(state)
     daily_metrics = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    cummulative_metrics = get_cummulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    return daily_metrics, cummulative_metrics
+    cumulative_metrics = get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
+    return daily_metrics, cumulative_metrics
 
 
 def get_metrics_by_county_and_state_US(county, state, forecast_horizon=60, lockdown_date=None):
     local_death_data = get_US_death_data_by_county_and_state(county, state)
     daily_metrics = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    cummulative_metrics = get_cummulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    return daily_metrics, cummulative_metrics
+    cumulative_metrics = get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
+    return daily_metrics, cumulative_metrics
 
 
 def plot_log_death_new_by_country(country, forecast_horizon=60, lockdown_date=None):
@@ -311,8 +311,8 @@ def plot_metrics_by_country(country, forecast_horizon=60, lockdown_date=None,
     local_death_data = get_death_data_by_country(country)
     daily_metrics = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
     daily_metrics[metrics].plot(title="Daily metrics for country: {}".format(country))
-    cummulative_metrics = get_cummulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    cummulative_metrics[metrics].plot(title="Cummulative metrics for country: {}".format(country))
+    cumulative_metrics = get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
+    cumulative_metrics[metrics].plot(title="Cumulative metrics for country: {}".format(country))
     
 
 def plot_metrics_by_state_US(state, forecast_horizon=60, lockdown_date=None, 
@@ -322,8 +322,8 @@ def plot_metrics_by_state_US(state, forecast_horizon=60, lockdown_date=None,
     local_death_data = get_US_death_data_by_state(state)
     daily_metrics = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
     daily_metrics[metrics].plot(title="Daily metrics for {}".format(state))
-    cummulative_metrics = get_cummulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    cummulative_metrics[metrics].plot(title="Cummulative metrics for {}".format(state))
+    cumulative_metrics = get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
+    cumulative_metrics[metrics].plot(title="Cumulative metrics for {}".format(state))
     
 
 def plot_metrics_by_county_and_state_US(county, state, forecast_horizon=60, lockdown_date=None, 
@@ -333,6 +333,6 @@ def plot_metrics_by_county_and_state_US(county, state, forecast_horizon=60, lock
     local_death_data = get_US_death_data_by_county_and_state(county, state)
     daily_metrics = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
     daily_metrics[metrics].plot(title="Daily metrics for {}, {}".format(county, state))
-    cummulative_metrics = get_cummulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
-    cummulative_metrics[metrics].plot(title="Cummulative metrics for {}, {}".format(county, state))
+    cumulative_metrics = get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
+    cumulative_metrics[metrics].plot(title="Cumulative metrics for {}, {}".format(county, state))
 
