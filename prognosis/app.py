@@ -160,6 +160,15 @@ if st.checkbox('Medical myths'):
     does it work? We think utmostly, this is an ***airborne*** disease. People got infected or death because of the air 
     they breath in, or more precisely by how much viruses in the air they put into their lungs at that particular 
     moment.''')
+    st.subheader('How does patient die from COVID-19?')
+    st.markdown('''
+    Short answer: not because of the virus but because of their own immune system, particularly the cytokine release 
+    syndrome. 
+    
+    Long answer: When patient got infected, virus can be everywhere from their blood, stool,.. but their center is in your 
+    tonsils. When the density of virus is enough, around 5-14 days after infection, you start to get a lot of dry cough
+    and its release the virus to the air and to your lungs. And then your lungs cells die very fast due to your immune 
+    system rush in and kill everything''')
 
 if st.checkbox('References'):
     st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19?source=history_widget')
