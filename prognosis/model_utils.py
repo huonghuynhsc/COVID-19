@@ -28,6 +28,30 @@ def get_US_death_data(csv_file='../csse_covid_19_data/csse_covid_19_time_series/
                                                  "Province_State": "State", 
                                                  "Admin2": "County"})
 
+@st.cache
+def get_lockdown_date_global(csv_file='data/lockdown_date_country.csv'):
+    return pd.read_csv(csv_file)[['country', 'lockdown_date']].set_index('country')
+
+@st.cache
+def get_lockdown_date_by_country(country):
+    try:
+        lockdown_date = pd.to_datetime(get_lockdown_date_global().loc[country][0])
+    except KeyError:
+        lockdown_date = dt.date.today()
+    return lockdown_date
+
+@st.cache
+def get_lockdown_date_US(csv_file='data/lockdown_date_state_US.csv'):
+    return pd.read_csv(csv_file)[['state', 'lockdown_date']].set_index('state')
+
+@st.cache
+def get_lockdown_date_by_state_US(state):
+    try:
+        lockdown_date = pd.to_datetime(get_lockdown_date_US().loc[state][0])
+    except KeyError:
+        lockdown_date = dt.date.today()
+    return lockdown_date
+
 
 def get_death_data_by_country(country):
     global_death_data = get_global_death_data()

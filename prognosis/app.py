@@ -34,6 +34,8 @@ if scope=='Country':
     death_data = get_global_death_data()
     #data_load_state.text('Loading data... done!')
     local = st.sidebar.selectbox('Which country do you like to see prognosis', death_data.Country.unique(), index=156)
+    lockdown_date = st.sidebar.date_input('When did full lockdown happen? Very IMPORTANT to get accurate prediction',
+                                          get_lockdown_date_by_country(local))
     forecast_fun = get_metrics_by_country
     debug_fun = get_log_daily_predicted_death_by_country
 else:
@@ -41,10 +43,12 @@ else:
     death_data = get_US_death_data()
     #data_load_state.text('Loading data... done!')
     local = st.sidebar.selectbox('Which US state do you like to see prognosis', death_data.State.unique(), index=9)
+    lockdown_date = st.sidebar.date_input('When did full lockdown happen? Very IMPORTANT to get accurate prediction',
+                                          get_lockdown_date_by_state_US(local))
     forecast_fun = get_metrics_by_state_US
     debug_fun = get_log_daily_predicted_death_by_state_US
 
-lockdown_date = st.sidebar.date_input('When did full lockdown happen? Very IMPORTANT to get accurate prediction')
+
 
 'You selected: ', local, 'with lock down date: ', lockdown_date
 metrics = st.sidebar.multiselect('Which metrics you like to plot?',
