@@ -148,6 +148,18 @@ if st.checkbox('About the model'):
             1. Need to understand how long since infection, patient is no longer a source of infection to forecast
             curve after lock down period relaxed.          
             2. Upgrade the calculation using mean to use distribution if enough data is available.''')
+if st.checkbox('Medical myths'):
+    st.markdown('I am not a medical doctor. I am a statistician but I strongly believe in this:')
+    st.subheader('How Vietnamese doctors treat SARS before and COVID19 now?')
+    st.markdown('''
+    The doctors open all doors and windows to let sunlight in and sick air out. Patients with mild symptom are suggested
+    to [gargling with salt water.]
+    (https://www.webmd.com/cold-and-flu/features/does-gargling-wlth-salt-water-ease-a-sore-throat#1) 
+    Some rare severe patients need treatment, ventilator and/or ECMO anyway. We have no other secrete weapon beside the
+    hot humid weather. By doing that, we get very low death rate, zero for now, and low infection rate for doctors. Why
+    does it work? We think utmostly, this is an ***airborne*** disease. People got infected or death because of the air 
+    they breath in, or more precisely by how much viruses in the air they put into their lungs at that particular 
+    moment.''')
 
 if st.checkbox('References'):
     st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19?source=history_widget')
