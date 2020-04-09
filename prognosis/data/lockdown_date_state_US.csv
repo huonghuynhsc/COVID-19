@@ -1,0 +1,52 @@
+country,state,lockdown_date,Note
+US,Alabama,2020/04/04,Stay at home order
+US,Alaska,2020/03/28,Stay at home order
+US,Arizona,2020/03/30,Stay at home order
+US,Arkansas,2020/03/17,Educational facilities closed
+US,California,2020/03/19,Stay at home order
+US,Colorado,2020/03/26,Stay at home order
+US,Connecticut,2020/03/17,Educational facilities closed
+US,Delaware,2020/03/24,Stay at home order
+US,District of Columbia,2020/03/30,Stay at home order
+US,Florida,2020/04/03,Stay at home order
+US,Georgia,2020/04/03,Stay at home order
+US,Hawaii,2020/03/25,Stay at home order
+US,Idaho,2020/03/25,Stay at home order
+US,Illinois ,2020/03/17,Educational facilities closed
+US,Indiana,2020/03/25,Stay at home order
+US,Iowa,2020/04/04,Educational facilities closed
+US,Kansas,2020/03/30,Stay at home order
+US,Kentucky,2020/03/20,Educational facilities closed
+US,Louisiana,2020/03/23,Stay at home order
+US,Maine,2020/04/02,Stay at home order
+US,Maryland,2020/03/30,Stay at home order
+US,Massachussets,2020/03/17,Educational facilities closed
+US,Michigan,2020/03/24,Stay at home order
+US,Minnesota,2020/03/27,Stay at home order
+US,Mississippi,2020/04/03,Stay at home order
+US,Missouri,2020/04/06,Stay at home order
+US,Montana,2020/03/26,Stay at home order
+US,Nebraska,,
+US,Nevada,2020/04/01,Stay at home order
+US,New Hampshire,2020/03/27,Stay at home order
+US,New Jersey,2020/03/21,Stay at home order
+US,New Mexico,2020/03/13,Educational facilities closed
+US,New York,2020/03/22,Stay at home order
+US,North Carolina ,2020/03/30,Stay at home order
+US,North Dakota,2020/03/16,Educational facilities closed
+US,Ohio,2020/03/23,Stay at home order
+US,Oklahoma,2020/03/17,Educational facilities closed
+US,Oregon,2020/03/23,Stay at home order
+US,Pennsylvania,2020/04/01,Stay at home order
+US,Rhode Island,2020/03/28,Stay at home order
+US,South Carolina,2020/04/07,Stay at home order
+US,South Dakota,2020/03/17,Educational facilities closed
+US,Tennessee,2020/04/02,Stay at home order
+US,Texas,2020/04/02,Stay at home order
+US,Utah,2020/03/16,Educational facilities closed
+US,Vermont,2020/03/24,Stay at home order
+US,Virginia,2020/03/30,Stay at home order
+US,Washington,2020/03/23,Stay at home order
+US,West Virginia,2020/03/25,Stay at home order
+US,Wisconsin,2020/03/25,Stay at home order
+US,Wyoming,2020/03/19,Educational facilities closed
