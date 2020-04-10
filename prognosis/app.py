@@ -196,7 +196,7 @@ if st.checkbox('Medical myths'):
     avoid close air spaces with lots of people, such as airplane, subway, church, etc.., and ***wear mask***.''')
 
 if st.checkbox('References'):
-    st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19?source=history_widget')
+    st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19')
     st.markdown('https://covid19.healthdata.org Reason we speed up our development. Lots of thing to like. One thing '
                 'we would do differently, the forecasting model.')
     st.markdown('https://www.streamlit.io Fast prototype.')
