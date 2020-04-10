@@ -6,15 +6,15 @@ from sklearn import linear_model
 import streamlit as st
 import pwlf
 
-DEATH_RATE = 0.01
-ICU_RATE = 0.05
-HOSPITAL_RATE = 0.15
-SYMPTOM_RATE = 0.2
-INFECT_2_HOSPITAL_TIME = 13
-HOSPITAL_2_ICU_TIME = 2
-ICU_2_DEATH_TIME = 5
-ICU_2_RECOVER_TIME = 11
-NOT_ICU_DISCHARGE_TIME = 7
+#DEATH_RATE = 0.01
+#ICU_RATE = 0.05
+#HOSPITAL_RATE = 0.15
+#SYMPTOM_RATE = 0.2
+#INFECT_2_HOSPITAL_TIME = 13
+#HOSPITAL_2_ICU_TIME = 2
+#ICU_2_DEATH_TIME = 5
+#ICU_2_RECOVER_TIME = 11
+#NOT_ICU_DISCHARGE_TIME = 7
 
 @st.cache
 def get_global_death_data(csv_file='../csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'):

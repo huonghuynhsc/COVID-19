@@ -1,5 +1,17 @@
 import streamlit as st
 from model_utils import *
+import model_utils as mu
+
+
+mu.DEATH_RATE = 1.0
+mu.ICU_RATE = 5.0
+mu.HOSPITAL_RATE = 15.0
+mu.SYMPTOM_RATE = 20.0
+mu.INFECT_2_HOSPITAL_TIME = 13
+mu.HOSPITAL_2_ICU_TIME = 2
+mu.ICU_2_DEATH_TIME = 5
+mu.ICU_2_RECOVER_TIME = 11
+mu.NOT_ICU_DISCHARGE_TIME = 7
 
 st.title('Covid-19 Prognosis using death cases')
 
@@ -31,7 +43,7 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
 scope = st.sidebar.selectbox('Country or US State', ['Country', 'State'], index=0)
 if scope=='Country':
     #data_load_state = st.text('Loading data...')
-    death_data = get_global_death_data()
+    death_data = mu.get_global_death_data()
     #data_load_state.text('Loading data... done!')
     local = st.sidebar.selectbox('Which country do you like to see prognosis', death_data.Country.unique(), index=156)
     lockdown_date = st.sidebar.date_input('When did full lockdown happen? Very IMPORTANT to get accurate prediction',
@@ -57,6 +69,28 @@ metrics = st.sidebar.multiselect('Which metrics you like to plot?',
                         ['death', 'predicted_death', 'ICU'])
 show_debug = st.sidebar.checkbox('Show fitted log death')
 show_data = st.sidebar.checkbox('Show raw data')
+if st.sidebar.checkbox('Advance: change assumptions'):
+    if st.sidebar.checkbox('Change rates'):
+        mu.DEATH_RATE = st.sidebar.slider('Overall death rate', value=mu.DEATH_RATE,
+                                       min_value=0.1, max_value=100.0, step=0.1)
+        mu.ICU_RATE = st.sidebar.slider('ICU rate', value=max(mu.ICU_RATE, mu.DEATH_RATE),
+                                       min_value=mu.DEATH_RATE, max_value=100.0, step=0.1)
+        mu.HOSPITAL_RATE = st.sidebar.slider('Hospitalized rate', value=max(mu.ICU_RATE, mu.HOSPITAL_RATE),
+                                       min_value=mu.ICU_RATE, max_value=100.0, step=0.1)
+        mu.SYMPTOM_RATE = st.sidebar.slider('Symptomatic rate', value=max(mu.SYMPTOM_RATE, mu.HOSPITAL_RATE),
+                                       min_value=mu.HOSPITAL_RATE, max_value=100.0, step=0.1)
+    if st.sidebar.checkbox('Change time'):
+        mu.INFECT_2_HOSPITAL_TIME = st.sidebar.slider('Time to hospitalized since infected',
+                                                      value=mu.INFECT_2_HOSPITAL_TIME, min_value=1, max_value=21)
+        mu.HOSPITAL_2_ICU_TIME = st.sidebar.slider('Time to ICU since hospitalized',
+                                                      value=mu.HOSPITAL_2_ICU_TIME, min_value=1, max_value=21)
+        mu.ICU_2_DEATH_TIME = st.sidebar.slider('Time to death since ICU ',
+                                                      value=mu.ICU_2_DEATH_TIME, min_value=1, max_value=21)
+        mu.ICU_2_RECOVER_TIME = st.sidebar.slider('Time to recover since ICU ',
+                                                      value=mu.ICU_2_RECOVER_TIME, min_value=1, max_value=30)
+        mu.NOT_ICU_DISCHARGE_TIME = st.sidebar.slider('Time to discharge',
+                                                      value=mu.NOT_ICU_DISCHARGE_TIME, min_value=1, max_value=21)
+
 if st.sidebar.button('Run'):
     main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_debug,show_data)
 
@@ -79,6 +113,7 @@ if st.checkbox('About the model'):
             Time to hospitalized since infectected: 13 days (5 days incubation and 8 days from symptom to severe)  
             Time to ICU since hospitalized: 2 days (assume only severe case needs to be hospitalized)  
             Time to death since ICU use: 5 days  
+            Time to recover since ICU use: 11 days
             7 days discharge if not in ICU or coming back from ICU  
             Average ICU time use: 10 (included both dead (5) and alive(11)): (5+11*4)/5  
             Only ICU (critical) patients can develop death  
@@ -192,8 +227,9 @@ if st.checkbox('Medical myths'):
     ''')
     st.subheader('How to prevent the transmission?')
     st.markdown('''
-    The main thing this website show is that lockdown actually working. So follow the lock down guideline, particularly 
-    avoid close air spaces with lots of people, such as airplane, subway, church, etc.., and ***wear mask***.''')
+    The main thing this website show is that lockdown is actually working. So follow the lock down guideline, 
+    particularly avoid close air spaces with lots of people, such as airplane, subway, church, etc.., 
+    and ***wear mask***.''')
 
 if st.checkbox('References'):
     st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19')
