@@ -21,7 +21,7 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
     try:
         daily, cumulative = forecast_fun(local, lockdown_date=lockdown_date)
     except ValueError:
-        st.error('Not enough data to provide prognosis, please check input lockdown date')
+        st.error('Not enough fatality data to provide prognosis, please check input and lockdown date')
         return None
     data_load_state.text('Forecasting... done!')
 
