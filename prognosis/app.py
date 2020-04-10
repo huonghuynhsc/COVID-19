@@ -165,10 +165,35 @@ if st.checkbox('Medical myths'):
     Short answer: not because of the virus but because of their own immune system, particularly the cytokine release 
     syndrome. 
     
-    Long answer: When patient got infected, virus can be everywhere from their blood, stool,.. but their center is in your 
-    tonsils. When the density of virus is enough, around 5-14 days after infection, you start to get a lot of dry cough
-    and its release the virus to the air and to your lungs. And then your lungs cells die very fast due to your immune 
-    system rush in and kill everything''')
+    Long answer: When patient got infected, virus can be everywhere from their respiratory tracts, blood, stool,.. 
+    but the critical center is in their tonsils. When the density of virus is enough, around 5-14 days after infection, 
+    patients start to get a lot of dry cough, which release the virus to the air and to their lungs. 
+    And then the lungs cells die very fast due to the immune system rush in and kill everything, the viruses and the
+    lung cells). Hence, the disease is named severe acute respiratory syndrome (SARS). How to prevent the death happen?
+    Keep patient's lung way from the viruses in the air. And as soon as you can.''')
+    st.subheader('Why ventilator is so important? or not?')
+    st.markdown('''
+    - When lots of lung cells die, the air sacs of the lungs become filled with a gummy yellow fluid, 
+    other organs got cut off from the oxygen in blood, and dying too.
+    Among those who are critically ill, profound acute hypoxemic respiratory failure from ARDS is the dominant finding.
+    The need for mechanical ventilation in those who are critically ill is high ranging from 42 to 100 percent. [Link]
+    (https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19-critical-care-issues)  
+    - But the ventilator also serves a very important purpose: keep the virus away from the air patient breathes in. So if 
+    your local does not have any ventilator left, you can make a cheap breathing device that can filter virus from the 
+    air intake and fan away air out of patient. Like open door with big fan. Try to not let patient bubble in their 
+    own viruses, just as the patients died in the [adult care facility]
+    (https://abc7news.com/health/6-dead-53-infected-with-covid-19-at-hayward-assisted-living-facility/6088815/)''')
+    st.subheader('How to be in the 95 percent patients that are not in critical condition?')
+    st.markdown('''
+    When you are positive for COVID19 but not have enough symptoms to be admitted to hospital, keep your place well 
+    ventilated, well lit with sun light, and warmer than normal. Gargle with salt water at least 3 times a day or when
+    you want to cough. Try to cough as less as you can using any method you know, or go outside if you need to. And then
+    watch your vitals, temperature and blood oxygen level for sign that you can be admitted to hospital for proper care.
+    ''')
+    st.subheader('How to prevent the transmission?')
+    st.markdown('''
+    The main thing this website show is that lockdown actually working. So follow the lock down guideline, particularly 
+    avoid close air spaces with lots of people, such as airplane, subway, church, etc.., and ***wear mask***.''')
 
 if st.checkbox('References'):
     st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19?source=history_widget')
