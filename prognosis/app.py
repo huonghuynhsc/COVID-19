@@ -1,5 +1,5 @@
 import streamlit as st
-from model_utils import *
+import datetime as dt
 import model_utils as mu
 
 
@@ -47,18 +47,18 @@ if scope=='Country':
     #data_load_state.text('Loading data... done!')
     local = st.sidebar.selectbox('Which country do you like to see prognosis', death_data.Country.unique(), index=156)
     lockdown_date = st.sidebar.date_input('When did full lockdown happen? Very IMPORTANT to get accurate prediction',
-                                          get_lockdown_date_by_country(local))
-    forecast_fun = get_metrics_by_country
-    debug_fun = get_log_daily_predicted_death_by_country
+                                          mu.get_lockdown_date_by_country(local))
+    forecast_fun = mu.get_metrics_by_country
+    debug_fun = mu.get_log_daily_predicted_death_by_country
 else:
     #data_load_state = st.text('Loading data...')
-    death_data = get_US_death_data()
+    death_data = mu.get_US_death_data()
     #data_load_state.text('Loading data... done!')
     local = st.sidebar.selectbox('Which US state do you like to see prognosis', death_data.State.unique(), index=9)
     lockdown_date = st.sidebar.date_input('When did full lockdown happen? Very IMPORTANT to get accurate prediction',
-                                          get_lockdown_date_by_state_US(local))
-    forecast_fun = get_metrics_by_state_US
-    debug_fun = get_log_daily_predicted_death_by_state_US
+                                          mu.get_lockdown_date_by_state_US(local))
+    forecast_fun = mu.get_metrics_by_state_US
+    debug_fun = mu.get_log_daily_predicted_death_by_state_US
 
 
 
@@ -93,7 +93,10 @@ if st.sidebar.checkbox('Advance: change assumptions'):
 
 if st.sidebar.button('Run'):
     main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_debug,show_data)
-
+    model_params = [dt.datetime.today(), scope, local, lockdown_date, mu.DEATH_RATE, mu.ICU_RATE, mu.HOSPITAL_RATE,
+                    mu.SYMPTOM_RATE, mu.INFECT_2_HOSPITAL_TIME, mu.HOSPITAL_2_ICU_TIME, mu.ICU_2_DEATH_TIME, 
+                    mu.ICU_2_RECOVER_TIME, mu.NOT_ICU_DISCHARGE_TIME]
+    mu.append_model_params_2_logs(model_params)
 if st.checkbox('Show authors'):
     st.subheader('Authors')
     st.markdown('Quoc Tran - Principal Data Scientist - WalmartLabs.')

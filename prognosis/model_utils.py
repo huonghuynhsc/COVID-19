@@ -5,6 +5,7 @@ import datetime as dt
 from sklearn import linear_model
 import streamlit as st
 import pwlf
+from csv import writer
 
 #DEATH_RATE = 0.01
 #ICU_RATE = 0.05
@@ -307,4 +308,12 @@ def get_log_daily_predicted_death_by_county_and_state_US(county, state, forecast
     log_predicted_death = get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
     return  pd.concat([log_daily_death, log_predicted_death], axis=1).replace([np.inf, -np.inf], np.nan)
 
+
+def append_model_params_2_logs(model_params, log_file='model_params_logs.csv'):
+    # Open file in append mode
+    with open(log_file, 'a+', newline='') as write_obj:
+        # Create a writer object from csv module
+        csv_writer = writer(write_obj)
+        # Add contents of list as last row in the csv file
+        csv_writer.writerow(model_params)
 
