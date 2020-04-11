@@ -7,7 +7,7 @@ mu.DEATH_RATE = 1.0
 mu.ICU_RATE = 5.0
 mu.HOSPITAL_RATE = 15.0
 mu.SYMPTOM_RATE = 20.0
-mu.INFECT_2_HOSPITAL_TIME = 13
+mu.INFECT_2_HOSPITAL_TIME = 12
 mu.HOSPITAL_2_ICU_TIME = 2
 mu.ICU_2_DEATH_TIME = 5
 mu.ICU_2_RECOVER_TIME = 11
@@ -117,18 +117,25 @@ if st.checkbox('About the model'):
             Number of **DEATH** is the most accurate metric. 
             It will be used to project other metrics under these [assumptions]
             (https://midasnetwork.us/covid-19/) for Covid19:  
-            The overall case fatality rate: 1 percent  
-            Patients need ICU: 5 percent (critical)  
-            Patients need hospitalized: 15 percent (severe)  
-            Patients with symptom: 20 percent   
-            Time to hospitalized since infectected: 13 days (5 days incubation and 8 days from symptom to severe)  
-            Time to ICU since hospitalized: 2 days (assume only severe case needs to be hospitalized)  
-            Time to death since ICU use: 5 days  
-            Time to recover since ICU use: 11 days
-            7 days discharge if not in ICU or coming back from ICU  
+            - The overall case fatality rate: 1 percent. This is the most debatable, so you can choose between 1 and 2.3   
+            - Patients need ICU: 5 percent (critical)  
+            - Patients need hospitalized: 15 percent (severe)  
+            - Patients with symptom: 20 percent   
+            - Time to hospitalized since infectected: 12 days (5 days incubation and 7 days from symptom to severe)  
+            - Time to ICU since hospitalized: 2 days (assume only severe case needs to be hospitalized)  
+            - Time to death since ICU use: 5 days  
+            - Time to recover since ICU use: 11 days  
+            - 7 days discharge if not in ICU or coming back from ICU  
             Average ICU time use: 10 (included both dead (5) and alive(11)): (5+11*4)/5  
             Only ICU (critical) patients can develop death  
-            ''')
+            
+            [Here]
+            (https://www.mercurynews.com/2020/04/11/when-coronavirus-kills-its-like-death-by-drowning-and-doctors-disagree-on-best-treatment/)
+            is an account from the news.   
+            In the assumptions, we mostly use the lower range from medical literature
+            because we want to calculate the minimum ICU and hospital beds needed. These assumptions are not valid in
+            local where resource is limited, while people die sooner and more often on ICU just because of not enough
+            ICU to put people on. E.g. Iran, Italy, New York when dead cases peak.''')
     st.subheader('Projections')
     st.markdown('''
             1. Total number of infection at large: death*100 (not too meaningful) or infected rate in population 
@@ -252,3 +259,5 @@ if st.checkbox('References'):
     st.markdown('https://covid19.healthdata.org Reason we speed up our development. Lots of thing to like. One thing '
                 'we would do differently, the forecasting model.')
     st.markdown('https://www.streamlit.io Fast prototype.')
+    st.markdown('https://www.mercurynews.com/2020/04/11/when-coronavirus-kills-its-like-death-by-drowning-and-doctors-disagree-on-best-treatment/')
+    st.markdown('https://www.statnews.com/2020/04/08/doctors-say-ventilators-overused-for-covid-19/')
