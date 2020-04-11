@@ -212,7 +212,10 @@ if st.checkbox('Medical myths'):
     hot humid weather. By doing that, we get very low death rate, zero for now, and low infection rate for doctors. Why
     does it work? We think utmostly, this is an ***airborne*** disease. People got infected or death because of the air 
     they breath in, or more precisely by how much viruses in the air they put into their lungs at that particular 
-    moment.''')
+    moment. That is why we see a mild progression, when patient's lung adapts to virus in the air, might suddenly turn to
+    a [death end]
+    (https://www.mercurynews.com/2020/04/11/when-coronavirus-kills-its-like-death-by-drowning-and-doctors-disagree-on-best-treatment/)
+    ''')
     st.subheader('How does patient die from COVID-19?')
     st.markdown('''
     Short answer: mostly not because of the virus but because of their own immune system, particularly the cytokine 
@@ -223,7 +226,7 @@ if st.checkbox('Medical myths'):
     infection, patients start to get a lot of dry cough, which release the virus to the air and to their lungs. 
     And then the lungs cells die very fast due to the immune system rush in and kill everything, the viruses and the
     lung cells. Hence, the disease is named severe acute respiratory syndrome (SARS). How to prevent the death happen?
-    Keep patient's lung way from the viruses in the air. And as soon as you can.''')
+    Keep patient's lung away from the viruses in the air. And as soon as you can.''')
     st.subheader('Why ventilator is so important? or not?')
     st.markdown('''
     - When lots of lung cells die, the air sacs of the lungs become filled with a gummy yellow fluid, 
@@ -254,10 +257,13 @@ if st.checkbox('Medical myths'):
     mu.append_row_2_logs([dt.datetime.today(), ], log_file='logs/medical_myths_logs.csv')
 
 if st.checkbox('References'):
-    st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19')
-    st.markdown('https://midasnetwork.us/covid-19/')
     st.markdown('https://covid19.healthdata.org Reason we speed up our development. Lots of thing to like. One thing '
                 'we would do differently, the forecasting model.')
     st.markdown('https://www.streamlit.io Fast prototype.')
+    st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19')
+    st.markdown('https://midasnetwork.us/covid-19/')
     st.markdown('https://www.mercurynews.com/2020/04/11/when-coronavirus-kills-its-like-death-by-drowning-and-doctors-disagree-on-best-treatment/')
     st.markdown('https://www.statnews.com/2020/04/08/doctors-say-ventilators-overused-for-covid-19/')
+    st.markdown('[Letter from the frontline, Italy]'
+                '(https://www.atsjournals.org/doi/pdf/10.1164/rccm.202003-0817LE)')
+    st.markdown('[COVID-19 Hospital Impact Model for Epidemics (CHIME)](https://penn-chime.phl.io)')
