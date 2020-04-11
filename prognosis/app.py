@@ -14,7 +14,13 @@ mu.ICU_2_RECOVER_TIME = 11
 mu.NOT_ICU_DISCHARGE_TIME = 7
 
 st.title('Covid-19 Prognosis using death cases')
-
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_debug, show_data):
     data_load_state = st.text('Forecasting...')
