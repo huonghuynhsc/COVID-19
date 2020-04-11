@@ -115,7 +115,8 @@ if st.checkbox('About the model'):
     st.subheader('Assumptions')
     st.markdown('''
             Number of **DEATH** is the most accurate metric. 
-            It will be used to project other metrics under these assumptions for Covid19:  
+            It will be used to project other metrics under these [assumptions]
+            (https://midasnetwork.us/covid-19/) for Covid19:  
             The overall case fatality rate: 1 percent  
             Patients need ICU: 5 percent (critical)  
             Patients need hospitalized: 15 percent (severe)  
@@ -207,14 +208,14 @@ if st.checkbox('Medical myths'):
     moment.''')
     st.subheader('How does patient die from COVID-19?')
     st.markdown('''
-    Short answer: not because of the virus but because of their own immune system, particularly the cytokine release 
-    syndrome. 
+    Short answer: mostly not because of the virus but because of their own immune system, particularly the cytokine 
+    release syndrome. 
     
-    Long answer: When patient got infected, virus can be everywhere from their respiratory tracts, blood, stool,.. 
-    but the critical center is in their tonsils. When the density of virus is enough, around 5-14 days after infection, 
-    patients start to get a lot of dry cough, which release the virus to the air and to their lungs. 
+    Long answer: When patient got infected, virus can be everywhere from their respiratory tracts, blood, stool,.. even
+    brain, but the critical center is in their tonsils. When the density of virus is enough, around 5-14 days after 
+    infection, patients start to get a lot of dry cough, which release the virus to the air and to their lungs. 
     And then the lungs cells die very fast due to the immune system rush in and kill everything, the viruses and the
-    lung cells). Hence, the disease is named severe acute respiratory syndrome (SARS). How to prevent the death happen?
+    lung cells. Hence, the disease is named severe acute respiratory syndrome (SARS). How to prevent the death happen?
     Keep patient's lung way from the viruses in the air. And as soon as you can.''')
     st.subheader('Why ventilator is so important? or not?')
     st.markdown('''
@@ -225,7 +226,10 @@ if st.checkbox('Medical myths'):
     (https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19-critical-care-issues)  
     - But the ventilator also serves a very important purpose: keep the virus away from the air patient breathes in. So if 
     your local does not have any ventilator left, you can make a cheap breathing device that can filter virus from the 
-    air intake and fan away air out of patient. Like open door with big fan. Try to not let patient bubble in their 
+    air intake and fan away air out of patient. Like open door with big fan. For patient that can not breath on their 
+    own, something like [this]
+    (https://newatlas.com/medical/british-engineers-modern-iron-lung-covid-19-ventilator-alternative/)
+    will help. Try to not let patient bubble in their 
     own viruses, just as the patients died in the [adult care facility]
     (https://abc7news.com/health/6-dead-53-infected-with-covid-19-at-hayward-assisted-living-facility/6088815/)''')
     st.subheader('How to be in the 95 percent patients that are not in critical condition?')
@@ -240,9 +244,11 @@ if st.checkbox('Medical myths'):
     The main thing this website show is that lockdown is actually working. So follow the lock down guideline, 
     particularly avoid close air spaces with lots of people, such as airplane, subway, church, etc.., 
     and ***wear mask***.''')
+    mu.append_row_2_logs([dt.datetime.today(), ], log_file='logs/medical_myths_logs.csv')
 
 if st.checkbox('References'):
     st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19')
+    st.markdown('https://midasnetwork.us/covid-19/')
     st.markdown('https://covid19.healthdata.org Reason we speed up our development. Lots of thing to like. One thing '
                 'we would do differently, the forecasting model.')
     st.markdown('https://www.streamlit.io Fast prototype.')
