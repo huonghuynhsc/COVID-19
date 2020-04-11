@@ -62,7 +62,7 @@ else:
 
 
 
-'You selected: ', local, 'with lock down date: ', lockdown_date
+'You selected: ', local, 'with lock down date: ', lockdown_date, '. Click Run to see forecast'
 metrics = st.sidebar.multiselect('Which metrics you like to plot?',
                         ('death', 'predicted_death', 'infected', 'symptomatic',
                          'hospitalized', 'ICU', 'hospital_beds'),
@@ -96,7 +96,8 @@ if st.sidebar.button('Run'):
     model_params = [dt.datetime.today(), scope, local, lockdown_date, mu.DEATH_RATE, mu.ICU_RATE, mu.HOSPITAL_RATE,
                     mu.SYMPTOM_RATE, mu.INFECT_2_HOSPITAL_TIME, mu.HOSPITAL_2_ICU_TIME, mu.ICU_2_DEATH_TIME, 
                     mu.ICU_2_RECOVER_TIME, mu.NOT_ICU_DISCHARGE_TIME]
-    mu.append_model_params_2_logs(model_params)
+    mu.append_row_2_logs(model_params)
+
 if st.checkbox('Show authors'):
     st.subheader('Authors')
     st.markdown('Quoc Tran - Principal Data Scientist - WalmartLabs.')

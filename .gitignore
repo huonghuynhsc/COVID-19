@@ -1,1 +1,3 @@
 .DS_Store
+logs/
+model_params_logs.csv
