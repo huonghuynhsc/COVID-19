@@ -108,6 +108,10 @@ if st.checkbox('Show authors'):
     st.markdown('Quoc Tran - Principal Data Scientist - WalmartLabs.')
     st.markdown('Huong Huynh - Data Scientist - Virtual Power Systems.')
     st.markdown('Feedback: hthuongsc@gmail.com')
+    if st.checkbox('Leave feedback directly'):
+        feedback = st.text_input('Write your feedback directly hear, include your email if you would like a reply')
+        if feedback != '':
+            mu.append_row_2_logs([dt.datetime.today(), feedback], log_file='logs/feedback_logs.csv')
 if st.checkbox('Show Datasource'):
     st.markdown('https://coronavirus.jhu.edu/map.html')
 if st.checkbox('About the model'):
@@ -247,7 +251,8 @@ if st.checkbox('Medical myths'):
     st.subheader('How to be in the 95 percent patients that are not in critical condition?')
     st.markdown('''
     When you are positive for COVID19 but not have enough symptoms to be admitted to hospital, keep your place well 
-    ventilated, well lit with sun light, and warmer than normal. Gargle with salt water at least 3 times a day or when
+    ventilated (open windows or fan out), well lit with sun light, and warmer than normal. 
+    Gargle with salt water at least 3 times a day or when
     you want to cough. Try to cough as less as you can using any method you know, or go outside if you need to. And then
     watch your vitals, temperature and blood oxygen level for sign that you can be admitted to hospital for proper care.
     ''')
