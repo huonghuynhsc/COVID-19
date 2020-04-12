@@ -235,11 +235,14 @@ if st.checkbox('Medical myths'):
     (https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19-critical-care-issues)  
     - But the ventilator also serves a very important purpose: keep the virus away from the air patient breathes in. So if 
     your local does not have any ventilator left, you can make a cheap breathing device that can filter virus from the 
-    air intake and fan away air out of patient. Like open door with big fan. For patient that can not breath on their 
-    own, something like [this]
+    air intake and fan away air out of patient. Like open door with big fan. Or fancier, using the [helmet]
+    (https://www.nbcnews.com/news/us-news/texas-mom-pop-business-flooded-orders-helmet-ventilators-amid-coronavirus-n1173466)
+    , which is proved working through [medical trial]
+    (https://www.uchicagomedicine.org/forefront/patient-care-articles/helmet-based-ventilation-is-superior-to-face-mask-for-patients-with-respiratory-distress)
+    . For patient that can not breath on their own, something like [this]
     (https://newatlas.com/medical/british-engineers-modern-iron-lung-covid-19-ventilator-alternative/)
-    will help. Try to not let patient bubble in their 
-    own viruses, just as the patients died in the [adult care facility]
+    will help. Try to not let patient bubble in their own viruses, just as the patients died in the 
+    [adult care facility]
     (https://abc7news.com/health/6-dead-53-infected-with-covid-19-at-hayward-assisted-living-facility/6088815/)''')
     st.subheader('How to be in the 95 percent patients that are not in critical condition?')
     st.markdown('''
@@ -256,13 +259,18 @@ if st.checkbox('Medical myths'):
     mu.append_row_2_logs([dt.datetime.today(), ], log_file='logs/medical_myths_logs.csv')
 
 if st.checkbox('References'):
-    st.markdown('https://covid19.healthdata.org Reason we speed up our development. Lots of thing to like. One thing '
+    st.markdown('[IHME COVID-19 Infection Spread](https://covid19.healthdata.org) '
+                'Reason we speed up our development. Lots of thing to like. One thing '
                 'we would do differently, the forecasting model.')
     st.markdown('https://www.streamlit.io Fast prototype.')
     st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19')
     st.markdown('https://midasnetwork.us/covid-19/')
-    st.markdown('https://www.mercurynews.com/2020/04/11/when-coronavirus-kills-its-like-death-by-drowning-and-doctors-disagree-on-best-treatment/')
-    st.markdown('https://www.statnews.com/2020/04/08/doctors-say-ventilators-overused-for-covid-19/')
     st.markdown('[Letter from the frontline, Italy]'
                 '(https://www.atsjournals.org/doi/pdf/10.1164/rccm.202003-0817LE)')
     st.markdown('[COVID-19 Hospital Impact Model for Epidemics (CHIME)](https://penn-chime.phl.io)')
+    st.markdown('[UW-Madison AFI DSI Covid-19 Research Portal](https://datascience.wisc.edu/covid19/)')
+    st.subheader('On the news')
+    st.markdown('https://www.mercurynews.com/2020/04/11/when-coronavirus-kills-its-like-death-by-drowning-and-doctors-disagree-on-best-treatment/')
+    st.markdown('https://www.statnews.com/2020/04/08/doctors-say-ventilators-overused-for-covid-19/')
+    st.markdown('https://www.uchicagomedicine.org/forefront/patient-care-articles/helmet-based-ventilation-is-superior-to-face-mask-for-patients-with-respiratory-distress')
+
