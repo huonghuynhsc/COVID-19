@@ -164,7 +164,7 @@ def get_number_ICU_need(daily_local_death_new):
         ICU_n = ICU_n.add(get_ICU_from_death(daily_local_death_new.iloc[i+1]), fill_value=0)
     return ICU_n
 
-@st.cache
+
 def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None):
     '''Since this is highly contagious disease. Daily new death, which is a proxy for daily new infected cases
     is model as d(t)=a*d(t-1) or equivalent to d(t) = b*a^(t). After a log transform, it becomes linear.
@@ -200,6 +200,7 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
     log_daily_death_before = log_daily_death[log_daily_death.time_idx < 0]
     regr_before = linear_model.HuberRegressor(fit_intercept=True)
     regr_before.fit(log_daily_death_before.time_idx.values.reshape(-1, 1), log_daily_death_before.death)
+    outliers_before = regr_before.outliers_
     log_predicted_death_before_values = regr_before.predict(forecast_time_idx[forecast_time_idx < 0].reshape(-1, 1))
     log_predicted_death_before_index = forecast_date_index[forecast_time_idx < 0]
     log_predicted_death_before = pd.DataFrame(log_predicted_death_before_values,
@@ -207,6 +208,7 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
     if all(forecast_time_idx < 0):
         print("Lockdown is not effective in forecast range. Second model not needed")
         log_predicted_death_after = None
+        outliers = outliers_before
     elif all(data_time_idx <= 1):
         print("Use default second model due to no data")
         regr_after = linear_model.HuberRegressor(fit_intercept=True)
@@ -216,18 +218,25 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
         log_predicted_death_after_index = forecast_date_index[forecast_time_idx >= 0]
         log_predicted_death_after = pd.DataFrame(log_predicted_death_after_values,
                                                  index=log_predicted_death_after_index)
+        if (len(log_daily_death) - len(outliers_before))>0:
+            outliers_after = np.array([False] * (len(log_daily_death) - len(outliers_before)))
+            outliers = np.concatenate((outliers_before, outliers_after))
+        else:
+            outliers = outliers_before
         log_predicted_death = pd.concat([log_predicted_death_before, log_predicted_death_after], axis=0)
     else:
         regr_after = linear_model.HuberRegressor(fit_intercept=True)
         log_daily_death_after = log_daily_death[log_daily_death.time_idx >= 0]
         regr_after.fit(log_daily_death_after.time_idx.values.reshape(-1, 1),
                        log_daily_death_after.death)
-        outliers = np.concatenate((regr_before.outliers_, regr_after.outliers_))
-        regr_pw = pwlf.PiecewiseLinFit(x=log_daily_death[~outliers].time_idx.values, y=log_daily_death[~outliers].death)
-        break_points = np.array([data_start_date_idx, 0, data_end_date_idx])
-        regr_pw.fit_with_breaks(break_points)
-        log_predicted_death_values = regr_pw.predict(forecast_time_idx)
-        log_predicted_death = pd.DataFrame(log_predicted_death_values, index=forecast_date_index)
+        outliers_after = regr_after.outliers_
+        outliers = np.concatenate((outliers_before, outliers_after))
+
+    regr_pw = pwlf.PiecewiseLinFit(x=log_daily_death[~outliers].time_idx.values, y=log_daily_death[~outliers].death)
+    break_points = np.array([data_start_date_idx, 0, data_end_date_idx])
+    regr_pw.fit_with_breaks(break_points)
+    log_predicted_death_values = regr_pw.predict(forecast_time_idx)
+    log_predicted_death = pd.DataFrame(log_predicted_death_values, index=forecast_date_index)
 
     log_predicted_death.columns = ['predicted_death']
     return log_predicted_death
