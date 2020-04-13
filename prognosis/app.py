@@ -72,7 +72,7 @@ metrics = st.sidebar.multiselect('Which metrics you like to plot?',
                         ('death', 'predicted_death', 'infected', 'symptomatic',
                          'hospitalized', 'ICU', 'hospital_beds'),
                         ['death', 'predicted_death', 'ICU'])
-show_debug = st.sidebar.checkbox('Show fitted log death')
+show_debug = st.sidebar.checkbox('Show fitted log death', value=True)
 show_data = st.sidebar.checkbox('Show raw data')
 if st.sidebar.checkbox('Advance: change assumptions'):
     if st.sidebar.checkbox('Change rates'):
