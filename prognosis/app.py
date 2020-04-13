@@ -261,6 +261,7 @@ if st.checkbox('Medical myths'):
     The main thing this website show is that lockdown is actually working. So follow the lock down guideline, 
     particularly avoid close air spaces with lots of people, such as airplane, subway, church, etc.., 
     and ***wear mask***.''')
+    st.markdown('***Splease spread the message and stay safe!***')
     mu.append_row_2_logs([dt.datetime.today(), ], log_file='logs/medical_myths_logs.csv')
 
 if st.checkbox('References'):

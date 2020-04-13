@@ -218,7 +218,12 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
                                                  index=log_predicted_death_after_index)
         log_predicted_death = pd.concat([log_predicted_death_before, log_predicted_death_after], axis=0)
     else:
-        regr_pw = pwlf.PiecewiseLinFit(x=log_daily_death.time_idx.values, y=log_daily_death.death)
+        regr_after = linear_model.HuberRegressor(fit_intercept=True)
+        log_daily_death_after = log_daily_death[log_daily_death.time_idx >= 0]
+        regr_after.fit(log_daily_death_after.time_idx.values.reshape(-1, 1),
+                       log_daily_death_after.death)
+        outliers = np.concatenate((regr_before.outliers_, regr_after.outliers_))
+        regr_pw = pwlf.PiecewiseLinFit(x=log_daily_death[~outliers].time_idx.values, y=log_daily_death[~outliers].death)
         break_points = np.array([data_start_date_idx, 0, data_end_date_idx])
         regr_pw.fit_with_breaks(break_points)
         log_predicted_death_values = regr_pw.predict(forecast_time_idx)
