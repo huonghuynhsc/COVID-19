@@ -236,22 +236,30 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
     break_points = np.array([data_start_date_idx, 0, data_end_date_idx])
     regr_pw.fit_with_breaks(break_points)
     log_predicted_death_values = regr_pw.predict(forecast_time_idx)
-    log_predicted_death = pd.DataFrame(log_predicted_death_values, index=forecast_date_index)
+    log_predicted_death_pred_var = regr_pw.prediction_variance(forecast_time_idx)
+    log_predicted_death_lower_bound_values = log_predicted_death_values - 1.96 * np.sqrt(log_predicted_death_pred_var)
+    log_predicted_death_upper_bound_values = log_predicted_death_values + 1.96 * np.sqrt(log_predicted_death_pred_var)
 
+    log_predicted_death = pd.DataFrame(log_predicted_death_values, index=forecast_date_index)
+    log_predicted_death_lower_bound = pd.DataFrame(log_predicted_death_lower_bound_values, index=forecast_date_index)
+    log_predicted_death_upper_bound = pd.DataFrame(log_predicted_death_upper_bound_values, index=forecast_date_index)
     log_predicted_death.columns = ['predicted_death']
-    return log_predicted_death
+    return log_predicted_death, log_predicted_death_lower_bound, log_predicted_death_upper_bound
 
 
 def get_daily_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None):
-    return np.exp(get_log_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)).astype(int)
+    log_daily_predicted_death, lb, ub = get_log_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)
+    return np.exp(log_daily_predicted_death).astype(int), np.exp(lb).astype(int), np.exp(ub).astype(int)
 
 
 def get_cumulative_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None):
-    return get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date).cumsum()
+    daily, lb, ub = get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)
+    return daily.cumsum(), lb.cumsum(), ub.cumsum()
 
 
 def get_daily_metrics_from_death_data(local_death_data, forecast_horizon=60, lockdown_date=None):
-    daily_predicted_death = get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)
+    daily_predicted_death, daily_predicted_death_lb, daily_predicted_death_ub  = \
+            get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     daily_infected_cases_new = get_infected_cases(daily_predicted_death)
@@ -261,6 +269,8 @@ def get_daily_metrics_from_death_data(local_death_data, forecast_horizon=60, loc
     daily_ICU_need = get_number_ICU_need(daily_predicted_death)
     return pd.concat([daily_local_death_new,
                       daily_predicted_death,
+                      daily_predicted_death_lb,
+                      daily_predicted_death_ub,
                       daily_infected_cases_new,
                       daily_symptomatic_cases_new,
                       daily_hospitalized_cases_new,
@@ -302,26 +312,36 @@ def get_log_daily_predicted_death_by_country(country, forecast_horizon=60, lockd
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
-    log_predicted_death = get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
-    return  pd.concat([log_daily_death, log_predicted_death], axis=1).replace([np.inf, -np.inf], np.nan)
+    log_predicted_death, log_predicted_death_lb, log_predicted_death_ub = \
+            get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
+    log_predicted_death_lb.columns =['lower_bound']
+    log_predicted_death_ub.columns = ['upper_bound']
+    return  pd.concat([log_daily_death, log_predicted_death, log_predicted_death_lb,
+                       log_predicted_death_ub], axis=1).replace([np.inf, -np.inf], np.nan)
 
 def get_log_daily_predicted_death_by_state_US(state, forecast_horizon=60, lockdown_date=None):
     local_death_data = get_US_death_data_by_state(state)
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
-    log_predicted_death = get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
-    return  pd.concat([log_daily_death, log_predicted_death], axis=1).replace([np.inf, -np.inf], np.nan)
-
+    log_predicted_death, log_predicted_death_lb, log_predicted_death_ub = \
+        get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
+    log_predicted_death_lb.columns = ['lower_bound']
+    log_predicted_death_ub.columns = ['upper_bound']
+    return pd.concat([log_daily_death, log_predicted_death, log_predicted_death_lb,
+                      log_predicted_death_ub], axis=1).replace([np.inf, -np.inf], np.nan)
 
 def get_log_daily_predicted_death_by_county_and_state_US(county, state, forecast_horizon=60, lockdown_date=None):
     local_death_data = get_US_death_data_by_county_and_state(county, state)
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
-    log_predicted_death = get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
-    return  pd.concat([log_daily_death, log_predicted_death], axis=1).replace([np.inf, -np.inf], np.nan)
-
+    log_predicted_death, log_predicted_death_lb, log_predicted_death_ub = \
+        get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
+    log_predicted_death_lb.columns = ['lower_bound']
+    log_predicted_death_ub.columns = ['upper_bound']
+    return pd.concat([log_daily_death, log_predicted_death, log_predicted_death_lb,
+                      log_predicted_death_ub], axis=1).replace([np.inf, -np.inf], np.nan)
 
 def append_row_2_logs(row, log_file='logs/model_params_logs.csv'):
     # Open file in append mode
