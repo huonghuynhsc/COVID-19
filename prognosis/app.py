@@ -69,7 +69,7 @@ else:
 
 'You selected: ', local, 'with lock down date: ', lockdown_date, '. Click Run to see forecast'
 metrics = st.sidebar.multiselect('Which metrics you like to plot?',
-                        ('death', 'predicted_death', 'infected', 'symptomatic',
+                        ('death', 'predicted_death', 'lower_bound', 'upper_bound', 'infected', 'symptomatic',
                          'hospitalized', 'ICU', 'hospital_beds'),
                         ['death', 'predicted_death', 'ICU'])
 show_debug = st.sidebar.checkbox('Show fitted log death', value=True)
@@ -269,6 +269,7 @@ if st.checkbox('References'):
                 'Reason we speed up our development. Lots of thing to like. One thing '
                 'we would do differently, the forecasting model.')
     st.markdown('https://www.streamlit.io Fast prototype.')
+    st.markdown('[pwlf](https://jekel.me/piecewise_linear_fit_py/index.html) Key tool for my model')
     st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19')
     st.markdown('https://midasnetwork.us/covid-19/')
     st.markdown('[Letter from the frontline, Italy]'

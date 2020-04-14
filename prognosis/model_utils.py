@@ -1,10 +1,34 @@
+# MIT License
+#
+# Copyright (c) 2020-2022 Quoc Tran
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import datetime as dt
 from sklearn import linear_model
 import streamlit as st
-import pwlf
+import pwlf_mod as pwlf
 from csv import writer
 
 #DEATH_RATE = 0.01
@@ -235,6 +259,7 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
     regr_pw = pwlf.PiecewiseLinFit(x=log_daily_death[~outliers].time_idx.values, y=log_daily_death[~outliers].death)
     break_points = np.array([data_start_date_idx, 0, data_end_date_idx])
     regr_pw.fit_with_breaks(break_points)
+    append_row_2_logs(regr_pw.beta, 'fitted_models.csv')
     log_predicted_death_values = regr_pw.predict(forecast_time_idx)
     log_predicted_death_pred_var = regr_pw.prediction_variance(forecast_time_idx)
     log_predicted_death_lower_bound_values = log_predicted_death_values - 1.96 * np.sqrt(log_predicted_death_pred_var)
@@ -244,6 +269,8 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
     log_predicted_death_lower_bound = pd.DataFrame(log_predicted_death_lower_bound_values, index=forecast_date_index)
     log_predicted_death_upper_bound = pd.DataFrame(log_predicted_death_upper_bound_values, index=forecast_date_index)
     log_predicted_death.columns = ['predicted_death']
+    log_predicted_death_lower_bound.columns = ['lower_bound']
+    log_predicted_death_upper_bound.columns = ['upper_bound']
     return log_predicted_death, log_predicted_death_lower_bound, log_predicted_death_upper_bound
 
 
@@ -314,8 +341,6 @@ def get_log_daily_predicted_death_by_country(country, forecast_horizon=60, lockd
     log_daily_death = np.log(daily_local_death_new)
     log_predicted_death, log_predicted_death_lb, log_predicted_death_ub = \
             get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
-    log_predicted_death_lb.columns =['lower_bound']
-    log_predicted_death_ub.columns = ['upper_bound']
     return  pd.concat([log_daily_death, log_predicted_death, log_predicted_death_lb,
                        log_predicted_death_ub], axis=1).replace([np.inf, -np.inf], np.nan)
 
@@ -326,8 +351,6 @@ def get_log_daily_predicted_death_by_state_US(state, forecast_horizon=60, lockdo
     log_daily_death = np.log(daily_local_death_new)
     log_predicted_death, log_predicted_death_lb, log_predicted_death_ub = \
         get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
-    log_predicted_death_lb.columns = ['lower_bound']
-    log_predicted_death_ub.columns = ['upper_bound']
     return pd.concat([log_daily_death, log_predicted_death, log_predicted_death_lb,
                       log_predicted_death_ub], axis=1).replace([np.inf, -np.inf], np.nan)
 
@@ -338,8 +361,6 @@ def get_log_daily_predicted_death_by_county_and_state_US(county, state, forecast
     log_daily_death = np.log(daily_local_death_new)
     log_predicted_death, log_predicted_death_lb, log_predicted_death_ub = \
         get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
-    log_predicted_death_lb.columns = ['lower_bound']
-    log_predicted_death_ub.columns = ['upper_bound']
     return pd.concat([log_daily_death, log_predicted_death, log_predicted_death_lb,
                       log_predicted_death_ub], axis=1).replace([np.inf, -np.inf], np.nan)
 
