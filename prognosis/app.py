@@ -72,7 +72,7 @@ else:
 metrics = st.sidebar.multiselect('Which metrics you like to plot?',
                         ('death', 'predicted_death', 'lower_bound', 'upper_bound', 'infected', 'symptomatic',
                          'hospitalized', 'ICU', 'hospital_beds'),
-                        ['death', 'predicted_death', 'ICU'])
+                        ['death', 'predicted_death', 'ICU', 'lower_bound', 'upper_bound'])
 show_debug = st.sidebar.checkbox('Show fitted log death', value=True)
 show_data = st.sidebar.checkbox('Show raw data')
 if st.sidebar.checkbox('Advance: change assumptions'):

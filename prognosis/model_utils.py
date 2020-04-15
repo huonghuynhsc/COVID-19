@@ -231,23 +231,31 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
                                               index=log_predicted_death_before_index)
     if all(forecast_time_idx < 0):
         print("Lockdown is not effective in forecast range. Second model not needed")
-        log_predicted_death_after = None
         outliers = outliers_before
-    elif all(data_time_idx <= 1):
-        print("Use default second model due to no data")
-        regr_after = linear_model.HuberRegressor(fit_intercept=True)
-        regr_after.coef_ = np.array([-0.04])
-        regr_after.intercept_ = log_predicted_death_before.iloc[-1, 0]
-        log_predicted_death_after_values = regr_after.predict(forecast_time_idx[forecast_time_idx >= 0].reshape(-1, 1))
-        log_predicted_death_after_index = forecast_date_index[forecast_time_idx >= 0]
-        log_predicted_death_after = pd.DataFrame(log_predicted_death_after_values,
-                                                 index=log_predicted_death_after_index)
+        regr_pw = pwlf.PiecewiseLinFit(x=log_daily_death[~outliers].time_idx.values, y=log_daily_death[~outliers].death)
+        break_points = np.array([data_start_date_idx, data_end_date_idx])
+        regr_pw.fit_with_breaks(break_points)
+        variance = regr_pw.variance()
+        log_predicted_death_pred_var_oos = variance * (forecast_time_idx[forecast_time_idx > data_end_date_idx] -
+                                                       data_end_date_idx)
+    elif all(data_time_idx <= 3):
+        print("Use default second model due to not enough data")
+
         if (len(log_daily_death) - len(outliers_before))>0:
             outliers_after = np.array([False] * (len(log_daily_death) - len(outliers_before)))
             outliers = np.concatenate((outliers_before, outliers_after))
         else:
             outliers = outliers_before
-        log_predicted_death = pd.concat([log_predicted_death_before, log_predicted_death_after], axis=0)
+        regr_pw = pwlf.PiecewiseLinFit(x=log_daily_death[~outliers].time_idx.values, y=log_daily_death[~outliers].death)
+        break_points = np.array([data_start_date_idx, 0, forecast_end_date_idx])
+        regr_pw.fit_with_breaks(break_points)
+        # Replace second slope by default value, learning from local with same temperature, transportation
+        regr_pw.beta[2]= -0.3
+        variance = regr_pw.variance()
+        log_predicted_death_pred_var_oos = variance*(forecast_time_idx[forecast_time_idx>data_end_date_idx]-
+                                                     data_end_date_idx)
+        print(regr_pw.variance())
+        print(len(forecast_time_idx[forecast_time_idx>data_end_date_idx]))
     else:
         regr_after = linear_model.HuberRegressor(fit_intercept=True)
         log_daily_death_after = log_daily_death[log_daily_death.time_idx >= 0]
@@ -255,12 +263,17 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
                        log_daily_death_after.death)
         outliers_after = regr_after.outliers_
         outliers = np.concatenate((outliers_before, outliers_after))
+        regr_pw = pwlf.PiecewiseLinFit(x=log_daily_death[~outliers].time_idx.values, y=log_daily_death[~outliers].death)
+        break_points = np.array([data_start_date_idx, 0, data_end_date_idx])
+        regr_pw.fit_with_breaks(break_points)
 
-    regr_pw = pwlf.PiecewiseLinFit(x=log_daily_death[~outliers].time_idx.values, y=log_daily_death[~outliers].death)
-    break_points = np.array([data_start_date_idx, 0, data_end_date_idx])
-    regr_pw.fit_with_breaks(break_points)
     log_predicted_death_values = regr_pw.predict(forecast_time_idx)
     log_predicted_death_pred_var = regr_pw.prediction_variance(forecast_time_idx)
+    if all(data_time_idx <= 3):
+        log_predicted_death_pred_var = np.concatenate(
+            (log_predicted_death_pred_var[:sum(forecast_time_idx <= data_end_date_idx)],
+             log_predicted_death_pred_var_oos))
+
     log_predicted_death_lower_bound_values = log_predicted_death_values - 1.96 * np.sqrt(log_predicted_death_pred_var)
     log_predicted_death_upper_bound_values = log_predicted_death_values + 1.96 * np.sqrt(log_predicted_death_pred_var)
 
