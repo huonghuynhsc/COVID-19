@@ -24,7 +24,7 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_debug, show_data):
     data_load_state = st.text('Forecasting...')
     try:
-        daily, cumulative = forecast_fun(local, lockdown_date=lockdown_date)
+        daily, cumulative, model_beta = forecast_fun(local, lockdown_date=lockdown_date)
     except ValueError:
         st.error('Not enough fatality data to provide prognosis, please check input and lockdown date')
         return None
@@ -36,7 +36,7 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
     st.subheader('Cumulative')
     st.line_chart(cumulative[metrics])
 
-    log_fit = debug_fun(local, lockdown_date=lockdown_date)
+    log_fit, _ = debug_fun(local, lockdown_date=lockdown_date)
     if show_debug:
         st.subheader('Fitted log of daily death before and after lock down being effective')
         st.line_chart(log_fit)
@@ -44,6 +44,7 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
         st.subheader('Raw Data')
         st.write('Daily metrics', daily)
         st.write('Cumulative metrics', cumulative)
+    mu.append_row_2_logs([dt.datetime.today(), scope, local, model_beta], 'logs/fitted_models.csv')
 
 scope = st.sidebar.selectbox('Country or US State', ['Country', 'State'], index=0)
 if scope=='Country':
@@ -117,7 +118,8 @@ if st.checkbox('Show Datasource'):
 if st.checkbox('About the model'):
     st.subheader('Assumptions')
     st.markdown('''
-            Number of **DEATH** is the most accurate metric. 
+            Number of **DEATH** is the most accurate metric, despite [undercount]
+            (https://www.nytimes.com/2020/04/10/nyregion/new-york-coronavirus-death-count.html), especially near peak.  
             It will be used to project other metrics under these [assumptions]
             (https://midasnetwork.us/covid-19/) for Covid19:  
             - The overall case fatality rate: 1 percent. This is the most debatable, so you can choose between 1 and 2.3   
