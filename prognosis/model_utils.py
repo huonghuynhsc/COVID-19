@@ -201,6 +201,8 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
     WARNING: if lockdown_date is not provided, we will default to no lockdown to raise awareness of worst case
     if no action. If you have info on lockdown date please use it to make sure the model provide accurate result'''
     daily_local_death_new = local_death_data.diff().fillna(0)
+    daily_local_death_new = daily_local_death_new.rolling(7, min_periods=1).mean()
+    #import pdb; pdb.set_trace()
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
     # log_daily_death.dropna(inplace=True)
