@@ -111,6 +111,7 @@ if st.checkbox('Show authors'):
     st.markdown('Quoc Tran - Principal Data Scientist - WalmartLabs.')
     st.markdown('Huong Huynh - Data Scientist - Virtual Power Systems.')
     st.markdown('Feedback: hthuongsc@gmail.com')
+    st.markdown('[Gibhub](https://github.com/QuocTran/COVID-19.git)')
     if st.checkbox('Leave feedback directly'):
         feedback = st.text_input('Write your feedback directly hear, include your email if you would like a reply')
         if feedback != '':

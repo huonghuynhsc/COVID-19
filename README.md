@@ -1,8 +1,16 @@
-# 2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE
+# 2019 Novel Coronavirus COVID-19 (2019-nCoV) Using Data Repository by Johns Hopkins CSSE
 
 
-This is the data repository for the 2019 Novel Coronavirus Visual Dashboard operated by the Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE). Also, Supported by ESRI Living Atlas Team and the Johns Hopkins University Applied Physics Lab (JHU APL).
+This is the repository for the Covid 19 Prognosis app https://covid19.techvsi.com/ , with data forked directly from the
+ data repository operated by the Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE). 
+ 
+ Contact Us: 
 
+Email: ttquoc@gmail.com, hthuongsc@gmail.com
+ 
+The below portion are retained from the original data repository.
+ 
+ 
 <br>
 
 <b>Visual Dashboard (desktop):</b><br>
