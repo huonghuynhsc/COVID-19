@@ -33,7 +33,7 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
     data_load_state.text('Forecasting... done!')
 
     st.subheader('Daily')
-    st.line_chart(daily[metrics])
+    st.line_chart(daily[metrics].drop(columns=['ICU', 'hospital_beds'], errors='ignore'))
 
     st.subheader('Cumulative')
     st.line_chart(cumulative[metrics])
