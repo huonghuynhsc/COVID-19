@@ -20,6 +20,8 @@ hide_menu_style = """
         </style>
         """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
+st.markdown('Our answer to understand COVID-19: how many deaths in the next two months, the real infected number'
+            ', how many hospital beds or ICU needed. In every countries and US states. ')
 
 def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_debug, show_data):
     data_load_state = st.text('Forecasting...')
@@ -68,7 +70,7 @@ else:
 
 
 
-'You selected: ', local, 'with lock down date: ', lockdown_date, '. Click Run to see forecast'
+'You selected: ', local, 'with lock down date: ', lockdown_date, '. Click **Run** on left sidebar to see forecast'
 metrics = st.sidebar.multiselect('Which metrics you like to plot?',
                         ('death', 'predicted_death', 'lower_bound', 'upper_bound', 'infected', 'symptomatic',
                          'hospitalized', 'ICU', 'hospital_beds'),

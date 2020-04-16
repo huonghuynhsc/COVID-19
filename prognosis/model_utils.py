@@ -201,7 +201,9 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
     WARNING: if lockdown_date is not provided, we will default to no lockdown to raise awareness of worst case
     if no action. If you have info on lockdown date please use it to make sure the model provide accurate result'''
     daily_local_death_new = local_death_data.diff().fillna(0)
-    daily_local_death_new = daily_local_death_new.rolling(7, min_periods=1).mean()
+    daily_local_death_new = daily_local_death_new.rolling(3, min_periods=1).mean()
+    #shift ahead 1 day to avoid overfitted due to average of exponential value
+    #daily_local_death_new = daily_local_death_new.shift(1)
     #import pdb; pdb.set_trace()
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
@@ -292,7 +294,7 @@ def get_daily_predicted_death(local_death_data, forecast_horizon=60, lockdown_da
     log_daily_predicted_death, lb, ub, model_beta = get_log_daily_predicted_death(local_death_data,
                                                                                   forecast_horizon,
                                                                                   lockdown_date)
-    return np.exp(log_daily_predicted_death).astype(int), np.exp(lb).astype(int), np.exp(ub).astype(int), model_beta
+    return np.exp(log_daily_predicted_death), np.exp(lb), np.exp(ub), model_beta
 
 
 def get_cumulative_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None):
