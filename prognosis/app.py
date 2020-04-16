@@ -281,6 +281,10 @@ if st.checkbox('References'):
                 '(https://www.atsjournals.org/doi/pdf/10.1164/rccm.202003-0817LE)')
     st.markdown('[COVID-19 Hospital Impact Model for Epidemics (CHIME)](https://penn-chime.phl.io)')
     st.markdown('[UW-Madison AFI DSI Covid-19 Research Portal](https://datascience.wisc.edu/covid19/)')
+    st.markdown('[Fast fact on US hospital beds]'
+                '(https://www.aha.org/statistics/fast-facts-us-hospitals)')
+    st.markdown('[Number of ventilators] '
+                '(https://www.centerforhealthsecurity.org/resources/COVID-19/COVID-19-fact-sheets/200214-VentilatorAvailability-factsheet.pdf)')
     st.subheader('On the news')
     st.markdown('https://www.mercurynews.com/2020/04/11/when-coronavirus-kills-its-like-death-by-drowning-and-doctors-disagree-on-best-treatment/')
     st.markdown('https://www.statnews.com/2020/04/08/doctors-say-ventilators-overused-for-covid-19/')
