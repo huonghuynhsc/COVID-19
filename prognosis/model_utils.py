@@ -146,7 +146,7 @@ def get_infected_cases(local_death_data):
     '''This number only is close to number of confirmed case in country very early in the disease and 
     can still do contact tracing or very wide testing, eg. South Korea, Germany'''
     delay_time = INFECT_2_HOSPITAL_TIME + HOSPITAL_2_ICU_TIME + ICU_2_DEATH_TIME
-    infected_cases = (1/DEATH_RATE)*local_death_data.tshift(-delay_time)
+    infected_cases = (100/DEATH_RATE)*local_death_data.tshift(-delay_time)
     infected_cases.columns = ['infected']
     return infected_cases
 
