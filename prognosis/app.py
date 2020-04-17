@@ -1,7 +1,10 @@
 import streamlit as st
 import datetime as dt
 import model_utils as mu
-
+import plotly.offline as py_offline
+import cufflinks as cf
+cf.go_offline()
+py_offline.__PLOTLY_OFFLINE_INITIALIZED = True
 
 mu.DEATH_RATE = 1.0
 mu.ICU_RATE = 5.0
@@ -33,15 +36,15 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
     data_load_state.text('Forecasting... done!')
 
     st.subheader('Daily')
-    st.line_chart(daily[metrics].drop(columns=['ICU', 'hospital_beds'], errors='ignore'))
+    st.plotly_chart(daily[metrics].drop(columns=['ICU', 'hospital_beds'], errors='ignore').iplot(asFigure=True))
 
     st.subheader('Cumulative')
-    st.line_chart(cumulative[metrics])
+    st.plotly_chart(cumulative[metrics].iplot(asFigure=True))
 
     log_fit, _ = debug_fun(local, lockdown_date=lockdown_date)
     if show_debug:
         st.subheader('Fitted log of daily death before and after lock down being effective')
-        st.line_chart(log_fit)
+        st.plotly_chart(log_fit.iplot(asFigure=True))
     if show_data:
         st.subheader('Raw Data')
         st.write('Daily metrics', daily)
@@ -71,10 +74,13 @@ else:
 
 
 'You selected: ', local, 'with lock down date: ', lockdown_date, '. Click **Run** on left sidebar to see forecast'
-metrics = st.sidebar.multiselect('Which metrics you like to plot?',
-                        ('death', 'predicted_death', 'lower_bound', 'upper_bound', 'infected', 'symptomatic',
-                         'hospitalized', 'ICU', 'hospital_beds'),
-                        ['death', 'predicted_death', 'ICU', 'lower_bound', 'upper_bound'])
+#metrics = st.sidebar.multiselect('Which metrics you like to plot?',
+#                        ('death', 'predicted_death', 'infected', 'symptomatic',
+#                         'hospitalized', 'ICU', 'hospital_beds'),
+#                        ['death', 'predicted_death', 'infected', 'symptomatic',
+#                         'hospitalized', 'ICU', 'hospital_beds'])
+
+metrics = ['death', 'predicted_death', 'infected', 'symptomatic', 'hospitalized', 'ICU', 'hospital_beds']
 show_debug = st.sidebar.checkbox('Show fitted log death', value=True)
 show_data = st.sidebar.checkbox('Show raw data')
 if st.sidebar.checkbox('Advance: change assumptions'):
