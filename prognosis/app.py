@@ -1,6 +1,7 @@
 import streamlit as st
 import datetime as dt
 import model_utils as mu
+import plotly.graph_objects as go
 import plotly.offline as py_offline
 import cufflinks as cf
 cf.go_offline()
@@ -36,15 +37,72 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
     data_load_state.text('Forecasting... done!')
 
     st.subheader('Daily')
-    st.plotly_chart(daily[metrics].drop(columns=['ICU', 'hospital_beds'], errors='ignore').iplot(asFigure=True))
+    fig = daily[metrics].drop(columns=['ICU', 'hospital_beds'], errors='ignore').iplot(asFigure=True)
+    x = daily.index
+    y_upper = daily.upper_bound.values
+    y_lower = daily.lower_bound.values
+    fig.add_trace(go.Scatter(
+        x=x,
+        y=y_upper,
+        fill=None,
+        showlegend=False,
+        name='Upper Bound'))
+
+    fig.add_trace(go.Scatter(
+        x=x,
+        y=y_lower,
+        fill='tonexty',
+        fillcolor='rgba(128,128,128,0.1)',
+        showlegend=False,
+        name='Lower Bound'
+    ))
+    st.plotly_chart(fig)
 
     st.subheader('Cumulative')
-    st.plotly_chart(cumulative[metrics].iplot(asFigure=True))
+    fig = cumulative[metrics].iplot(asFigure=True)
+    x = cumulative.index
+    y_upper = cumulative.upper_bound.values
+    y_lower = cumulative.lower_bound.values
+    fig.add_trace(go.Scatter(
+        x=x,
+        y=y_upper,
+        fill=None,
+        showlegend=False,
+        name='Upper Bound'))
+
+    fig.add_trace(go.Scatter(
+        x=x,
+        y=y_lower,
+        fill='tonexty',
+        fillcolor='rgba(128,128,128,0.1)',
+        showlegend=False,
+        name='Lower Bound'
+    ))
+    st.plotly_chart(fig)
 
     log_fit, _ = debug_fun(local, lockdown_date=lockdown_date)
     if show_debug:
         st.subheader('Fitted log of daily death before and after lock down being effective')
-        st.plotly_chart(log_fit.iplot(asFigure=True))
+        fig = log_fit.drop(columns=['lower_bound', 'upper_bound'], errors='ignore').iplot(asFigure=True)
+        x = log_fit.index
+        y_upper = log_fit.upper_bound.values
+        y_lower = log_fit.lower_bound.values
+        fig.add_trace(go.Scatter(
+            x=x,
+            y=y_upper,
+            fill=None,
+            showlegend=False,
+            name='Upper Bound'))
+
+        fig.add_trace(go.Scatter(
+            x=x,
+            y=y_lower,
+            fill='tonexty',
+            fillcolor='rgba(128,128,128,0.1)',
+            showlegend=False,
+            name='Lower Bound'
+        ))
+        st.plotly_chart(fig)
     if show_data:
         st.subheader('Raw Data')
         st.write('Daily metrics', daily)
@@ -74,13 +132,13 @@ else:
 
 
 'You selected: ', local, 'with lock down date: ', lockdown_date, '. Click **Run** on left sidebar to see forecast'
-#metrics = st.sidebar.multiselect('Which metrics you like to plot?',
-#                        ('death', 'predicted_death', 'infected', 'symptomatic',
-#                         'hospitalized', 'ICU', 'hospital_beds'),
-#                        ['death', 'predicted_death', 'infected', 'symptomatic',
-#                         'hospitalized', 'ICU', 'hospital_beds'])
+metrics = st.sidebar.multiselect('Which metrics you like to plot?',
+                        ('death', 'predicted_death', 'infected', 'symptomatic',
+                         'hospitalized', 'ICU', 'hospital_beds'),
+                        ['death', 'predicted_death', 'infected', 'symptomatic',
+                         'hospitalized', 'ICU', 'hospital_beds'])
 
-metrics = ['death', 'predicted_death', 'infected', 'symptomatic', 'hospitalized', 'ICU', 'hospital_beds']
+#metrics = ['death', 'predicted_death', 'infected', 'symptomatic', 'hospitalized', 'ICU', 'hospital_beds']
 show_debug = st.sidebar.checkbox('Show fitted log death', value=True)
 show_data = st.sidebar.checkbox('Show raw data')
 if st.sidebar.checkbox('Advance: change assumptions'):
