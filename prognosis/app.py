@@ -131,8 +131,9 @@ else:
 
 
 
-'You selected: ', local, 'with lock down date: ', lockdown_date, '. Click **Run** on left sidebar to see forecast'
-metrics = st.sidebar.multiselect('Which metrics you like to plot?',
+'You selected: ', local, 'with lock down date: ', lockdown_date, '. Click **Run** on left sidebar to see forecast. Plot' \
+                                                                 ' is interactive.'
+metrics = st.sidebar.multiselect('Which metrics you like to calculate?',
                         ('death', 'predicted_death', 'infected', 'symptomatic',
                          'hospitalized', 'ICU', 'hospital_beds'),
                         ['death', 'predicted_death', 'infected', 'symptomatic',
