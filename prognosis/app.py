@@ -27,10 +27,11 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 st.markdown('Our answer to understand COVID-19: how many deaths in the next two months, the real infected number'
             ', how many hospital beds or ICU needed. In every countries and US states. ')
 
-def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_debug, show_data):
+def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug, show_data):
     data_load_state = st.text('Forecasting...')
     try:
-        daily, cumulative, model_beta = forecast_fun(local, lockdown_date=lockdown_date)
+        daily, cumulative, model_beta = forecast_fun(local,
+                                                     forecast_horizon=forecast_horizon, lockdown_date=lockdown_date)
     except ValueError:
         st.error('Not enough fatality data to provide prognosis, please check input and lockdown date')
         return None
@@ -80,8 +81,9 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
     ))
     st.plotly_chart(fig)
 
-    log_fit, _ = debug_fun(local, lockdown_date=lockdown_date)
+
     if show_debug:
+        log_fit, _ = debug_fun(local, forecast_horizon=forecast_horizon, lockdown_date=lockdown_date)
         st.subheader('Fitted log of daily death before and after lock down being effective')
         fig = log_fit.drop(columns=['lower_bound', 'upper_bound'], errors='ignore').iplot(asFigure=True)
         x = log_fit.index
@@ -138,8 +140,7 @@ metrics = st.sidebar.multiselect('Which metrics you like to calculate?',
                          'hospitalized', 'ICU', 'hospital_beds'),
                         ['death', 'predicted_death', 'infected', 'symptomatic',
                          'hospitalized', 'ICU', 'hospital_beds'])
-
-#metrics = ['death', 'predicted_death', 'infected', 'symptomatic', 'hospitalized', 'ICU', 'hospital_beds']
+forecast_horizon = st.sidebar.slider('Forecast Horizon', value=60, min_value=30, max_value=90)
 show_debug = st.sidebar.checkbox('Show fitted log death', value=True)
 show_data = st.sidebar.checkbox('Show raw data')
 if st.sidebar.checkbox('Advance: change assumptions'):
@@ -165,7 +166,7 @@ if st.sidebar.checkbox('Advance: change assumptions'):
                                                       value=mu.NOT_ICU_DISCHARGE_TIME, min_value=1, max_value=21)
 
 if st.sidebar.button('Run'):
-    main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_debug,show_data)
+    main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug,show_data)
     model_params = [dt.datetime.today(), scope, local, lockdown_date, mu.DEATH_RATE, mu.ICU_RATE, mu.HOSPITAL_RATE,
                     mu.SYMPTOM_RATE, mu.INFECT_2_HOSPITAL_TIME, mu.HOSPITAL_2_ICU_TIME, mu.ICU_2_DEATH_TIME, 
                     mu.ICU_2_RECOVER_TIME, mu.NOT_ICU_DISCHARGE_TIME]

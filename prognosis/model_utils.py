@@ -364,7 +364,7 @@ def get_log_daily_predicted_death_by_country(country, forecast_horizon=60, lockd
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
     log_predicted_death, log_predicted_death_lb, log_predicted_death_ub, model_beta = \
-            get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
+            get_log_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)
     return  pd.concat([log_daily_death, log_predicted_death, log_predicted_death_lb,
                        log_predicted_death_ub], axis=1).replace([np.inf, -np.inf], np.nan), model_beta
 
@@ -375,7 +375,7 @@ def get_log_daily_predicted_death_by_state_US(state, forecast_horizon=60, lockdo
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
     log_predicted_death, log_predicted_death_lb, log_predicted_death_ub, model_beta = \
-        get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
+        get_log_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)
     return pd.concat([log_daily_death, log_predicted_death, log_predicted_death_lb,
                       log_predicted_death_ub], axis=1).replace([np.inf, -np.inf], np.nan), model_beta
 
@@ -386,7 +386,7 @@ def get_log_daily_predicted_death_by_county_and_state_US(county, state, forecast
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
     log_predicted_death, log_predicted_death_lb, log_predicted_death_ub, model_beta = \
-        get_log_daily_predicted_death(local_death_data, lockdown_date=lockdown_date)
+        get_log_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)
     return pd.concat([log_daily_death, log_predicted_death, log_predicted_death_lb,
                       log_predicted_death_ub], axis=1).replace([np.inf, -np.inf], np.nan), model_beta
 
