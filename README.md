@@ -1,7 +1,7 @@
 # 2019 Novel Coronavirus COVID-19 (2019-nCoV) Using Data Repository by Johns Hopkins CSSE
 
 
-This is the repository for the Covid 19 Prognosis app https://aipert.org hoặc https://covid19.techvsi.com/ , with data forked directly from the
+This is the repository for the Covid 19 Prognosis app https://aipert.org or https://covid19.techvsi.com/ , with data forked directly from the
  data repository operated by the Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE). 
  
  Contact Us: 
