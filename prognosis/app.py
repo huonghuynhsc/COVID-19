@@ -24,7 +24,7 @@ hide_menu_style = """
         </style>
         """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
-st.markdown('Our answer to understand COVID-19: how many deaths in the next two months, the real infected number'
+st.markdown('Our answer to understand COVID-19: how many deaths in the future, the real infected number'
             ', how many hospital beds or ICU needed. In every countries and US states. ')
 
 def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_debug, show_data):
@@ -36,8 +36,9 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
         return None
     data_load_state.text('Forecasting... done!')
 
-    st.subheader('Daily')
-    fig = daily[metrics].drop(columns=['ICU', 'hospital_beds'], errors='ignore').iplot(asFigure=True)
+    st.subheader('Deaths')
+    show_metrics = ['death', 'predicted_death']
+    fig = daily[show_metrics].drop(columns=['ICU', 'hospital_beds'], errors='ignore').iplot(asFigure=True)
     x = daily.index
     y_upper = daily.upper_bound.values
     y_lower = daily.lower_bound.values
@@ -45,6 +46,7 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
         x=x,
         y=y_upper,
         fill=None,
+        line_color='rgba(128,128,128,0)',
         showlegend=False,
         name='Upper Bound'))
 
@@ -53,13 +55,17 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
         y=y_lower,
         fill='tonexty',
         fillcolor='rgba(128,128,128,0.1)',
+        line_color='rgba(128,128,128,0)',
         showlegend=False,
         name='Lower Bound'
     ))
+    fig.update_layout(
+        title="Daily",
+        yaxis_title="Death",
+    )
     st.plotly_chart(fig)
 
-    st.subheader('Cumulative')
-    fig = cumulative[metrics].iplot(asFigure=True)
+    fig = cumulative[show_metrics].iplot(asFigure=True)
     x = cumulative.index
     y_upper = cumulative.upper_bound.values
     y_lower = cumulative.lower_bound.values
@@ -80,11 +86,15 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
         showlegend=False,
         name='Lower Bound'
     ))
+    fig.update_layout(
+        title="Cummulative",
+        yaxis_title="Death",
+    )
+
     st.plotly_chart(fig)
 
     log_fit, _ = debug_fun(local, lockdown_date=lockdown_date)
     if show_debug:
-        st.subheader('Fitted log of daily death before and after lock down being effective')
         fig = log_fit.drop(columns=['lower_bound', 'upper_bound'], errors='ignore').iplot(asFigure=True)
         x = log_fit.index
         y_upper = log_fit.upper_bound.values
@@ -106,7 +116,66 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
             showlegend=False,
             name='Lower Bound'
         ))
+        fig.update_layout(
+            title="Fitted log of daily death before and after lock down being effective",
+            yaxis_title="Log Daily Death",
+        )
         st.plotly_chart(fig)
+
+    st.subheader('Estimated Cases and Essential Resources')
+    fig = daily[metrics].drop(columns=['ICU', 'hospital_beds'], errors='ignore').iplot(asFigure=True)
+    x = daily.index
+    y_upper = daily.upper_bound.values
+    y_lower = daily.lower_bound.values
+    fig.add_trace(go.Scatter(
+        x=x,
+        y=y_upper,
+        fill=None,
+        line_color='rgba(128,128,128,0)',
+        showlegend=False,
+        name='Upper Bound'))
+
+    fig.add_trace(go.Scatter(
+        x=x,
+        y=y_lower,
+        fill='tonexty',
+        fillcolor='rgba(128,128,128,0.1)',
+        line_color='rgba(128,128,128,0)',
+        showlegend=False,
+        name='Lower Bound'
+    ))
+    fig.update_layout(
+        title="Daily",
+    )
+    st.plotly_chart(fig)
+
+    fig = cumulative[metrics].iplot(asFigure=True)
+    x = cumulative.index
+    y_upper = cumulative.upper_bound.values
+    y_lower = cumulative.lower_bound.values
+    fig.add_trace(go.Scatter(
+        x=x,
+        y=y_upper,
+        fill=None,
+        line_color='rgba(128,128,128,0)',
+        showlegend=False,
+        name='Upper Bound'))
+
+    fig.add_trace(go.Scatter(
+        x=x,
+        y=y_lower,
+        fill='tonexty',
+        fillcolor='rgba(128,128,128,0.1)',
+        line_color='rgba(128,128,128,0)',
+        showlegend=False,
+        name='Lower Bound'
+    ))
+    fig.update_layout(
+        title="Cummulative",
+    )
+
+    st.plotly_chart(fig)
+
     if show_data:
         st.subheader('Raw Data')
         st.write('Daily metrics', daily)

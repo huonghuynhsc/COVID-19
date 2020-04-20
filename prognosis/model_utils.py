@@ -125,7 +125,8 @@ def get_hospital_beds_from_death(death_row):
     no_ICU_hospital_use = get_impute_from_death(death_row=death_row, 
                                                 periods=no_ICU_hospital_use_periods,
                                                 end_date_offset=no_ICU_hospital_use_end_date_offset)
-    hospital_beds = dead_hospital_use.add(((ICU_RATE-DEATH_RATE)/DEATH_RATE)*ICU_recovered_hospital_use, fill_value=0)                                     .add(((HOSPITAL_RATE-ICU_RATE)/DEATH_RATE)*no_ICU_hospital_use, fill_value=0)
+    hospital_beds = dead_hospital_use.add(((ICU_RATE-DEATH_RATE)/DEATH_RATE)*ICU_recovered_hospital_use, fill_value=0)\
+            .add(((HOSPITAL_RATE-ICU_RATE)/DEATH_RATE)*no_ICU_hospital_use, fill_value=0)
     hospital_beds.columns = ['hospital_beds']
     return hospital_beds
 
