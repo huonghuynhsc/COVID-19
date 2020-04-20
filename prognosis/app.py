@@ -67,6 +67,7 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
         x=x,
         y=y_upper,
         fill=None,
+        line_color='rgba(128,128,128,0)',
         showlegend=False,
         name='Upper Bound'))
 
@@ -75,6 +76,7 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
         y=y_lower,
         fill='tonexty',
         fillcolor='rgba(128,128,128,0.1)',
+        line_color='rgba(128,128,128,0)',
         showlegend=False,
         name='Lower Bound'
     ))
@@ -91,6 +93,7 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
             x=x,
             y=y_upper,
             fill=None,
+            line_color='rgba(128,128,128,0)',
             showlegend=False,
             name='Upper Bound'))
 
@@ -99,6 +102,7 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
             y=y_lower,
             fill='tonexty',
             fillcolor='rgba(128,128,128,0.1)',
+            line_color='rgba(128,128,128,0)',
             showlegend=False,
             name='Lower Bound'
         ))
