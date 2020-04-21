@@ -300,7 +300,14 @@ def get_daily_predicted_death(local_death_data, forecast_horizon=60, lockdown_da
 
 def get_cumulative_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None):
     daily, lb, ub, model_beta = get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date)
-    return daily.cumsum(), lb.cumsum(), ub.cumsum(), model_beta
+    cumulative = daily.cumsum()
+    data_end_date = max(local_death_data.index)+dt.timedelta(-1)
+    lb.loc[local_death_data.index] = 0
+    lb.loc[data_end_date] = cumulative.loc[data_end_date]
+    ub.loc[local_death_data.index] = 0
+    ub.loc[data_end_date] = cumulative.loc[data_end_date]
+
+    return cumulative, lb.cumsum(), ub.cumsum(), model_beta
 
 
 def get_daily_metrics_from_death_data(local_death_data, forecast_horizon=60, lockdown_date=None):
@@ -325,11 +332,21 @@ def get_daily_metrics_from_death_data(local_death_data, forecast_horizon=60, loc
 
 
 def get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon=60, lockdown_date=None):
-    daily_metrics = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
+    daily_metrics, model_beta = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
     cumulative_metrics = daily_metrics.drop(columns=['ICU', 'hospital_beds']).cumsum()
+    # data_end_date = max(local_death_data.index)
+    # cumulative_metrics['lower_bound'] = daily_metrics['lower_bound']
+    # cumulative_metrics['lower_bound'].loc[local_death_data.index] = np.nan
+    # cumulative_metrics['lower_bound'].loc[data_end_date] = local_death_data.loc[data_end_date][0]
+    # cumulative_metrics['lower_bound'] = cumulative_metrics['lower_bound'].cumsum()
+    # cumulative_metrics['upper_bound'] = daily_metrics['upper_bound']
+    # cumulative_metrics['upper_bound'].loc[local_death_data.index] = np.nan
+    # cumulative_metrics['upper_bound'].loc[data_end_date] = local_death_data.loc[data_end_date][0]
+    # cumulative_metrics['upper_bound'] = cumulative_metrics['upper_bound'].cumsum()
     cumulative_metrics['ICU'] = daily_metrics['ICU']
     cumulative_metrics['hospital_beds'] = daily_metrics['hospital_beds']
-    return cumulative_metrics
+
+    return cumulative_metrics, model_beta
 
 
 def get_metrics_by_country(country, forecast_horizon=60, lockdown_date=None):
@@ -338,6 +355,7 @@ def get_metrics_by_country(country, forecast_horizon=60, lockdown_date=None):
     cumulative_metrics = daily_metrics.drop(columns=['ICU', 'hospital_beds']).cumsum()
     cumulative_metrics['ICU'] = daily_metrics['ICU']
     cumulative_metrics['hospital_beds'] = daily_metrics['hospital_beds']
+    #cumulative_metrics, model_beta = get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
     return daily_metrics, cumulative_metrics, model_beta
 
 
