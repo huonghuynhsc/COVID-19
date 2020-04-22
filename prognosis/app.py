@@ -8,8 +8,8 @@ cf.go_offline()
 py_offline.__PLOTLY_OFFLINE_INITIALIZED = True
 
 mu.DEATH_RATE = 1.0
-mu.ICU_RATE = 5.0
-mu.HOSPITAL_RATE = 15.0
+mu.ICU_RATE = 2.2
+mu.HOSPITAL_RATE = 6.0
 mu.SYMPTOM_RATE = 20.0
 mu.INFECT_2_HOSPITAL_TIME = 12
 mu.HOSPITAL_2_ICU_TIME = 2
@@ -279,9 +279,9 @@ if st.checkbox('About the model'):
             (https://www.nytimes.com/2020/04/10/nyregion/new-york-coronavirus-death-count.html), especially near peak.  
             It will be used to project other metrics under these [assumptions]
             (https://midasnetwork.us/covid-19/) for Covid19:  
-            - The overall case fatality rate: 1 percent. This is the most debatable, so you can choose between 1 and 2.3   
-            - Patients need ICU: 5 percent (critical)  
-            - Patients need hospitalized: 15 percent (severe)  
+            - The overall case fatality rate: 1 percent.    
+            - Patients need ICU: 2.2 percent (critical)  
+            - Patients need hospitalized: 6 percent (severe)  
             - Patients with symptom: 20 percent   
             - Time to hospitalized since infectected: 12 days (5 days incubation and 7 days from symptom to severe)  
             - Time to ICU since hospitalized: 2 days (assume only severe case needs to be hospitalized)  
@@ -309,15 +309,15 @@ if st.checkbox('About the model'):
             Other alternative is whole population testing to get this number immediately. 
             2. With a correct forecast on number of death, we can get the forecast for number of hospital beds needed. 
             This is  used to build more hospital beds in advance.
-            Each new death equal to 15 hospitalized (5+2)7 days before the death and continue for 10 days
-            (using the 15% hospital rate and 1% death rate and 10 days average hospitalized and 
+            Each new death equal to 6 hospitalized (5+2)7 days before the death and continue for 10 days
+            (using the 6% hospital rate and 1% death rate and 10 days average hospitalized and 
             5 days from ICU to death, 2 days from hospital to ICU)
             3. With a correct forecast number of death, we can get the forecast for number of ICU needed. 
             This is used to prepare ICU and buying ventilators or prepare for hospital white flags moment, 
             when doctors have to decide who to treat and who left to death due to constraint on ICU, ventilator. 
             This is also needed to prepare for social unrest.
-            Each new death equal to 5 ICU beds 5 days before the death and continue for 10 days 
-            (using the 5% ICU rate and 1% death rate and 10 days average ICU used)
+            Each new death equal to 2.2 ICU beds 5 days before the death and continue for 10 days 
+            (using the 2.2% ICU rate and 1% death rate and 10 days average ICU used)
             ''')
     st.subheader('Forecasting death')
     st.markdown('''
@@ -344,7 +344,7 @@ if st.checkbox('About the model'):
             
             0. ***Do not use only confirmed case to make decision***. It is misleading and distorted by testing capicity
             1. Country with severe testing constraint will see death rate lurking around 10-15%, 
-            which is 1% death/15%hospitalized. E.g. Italy, Spain, Iran at the beginning. 
+            which is 1% death/6% hospitalized. E.g. Italy, Spain, Iran at the beginning. 
             While country with enough testing for all symptomatic patients see rate less than 5% (1%/20%).
             And country that can test most of potential patients, through contact tracing like South Korea and Germany,
             can get closer to 1%. It is very hard to get under 1% unless an effective cure is in hand. Maybe Vietnam?   
@@ -356,7 +356,7 @@ if st.checkbox('About the model'):
             4. It needs about a month from the peak for new cases completely dissipate. 
             The number of death is also slow down but have a fat tail and a about 20 days longer than the cases tail.            
             5. The above does not apply to country using widespread testing in place of SIP/lockdown like Korea.            
-            6. When no ICU, ventilator available, death rate can increase at most 5 times
+            6. When no ICU, ventilator available, death rate can increase at most 2.2 times
             ''')
     st.subheader('TODO')
     st.markdown('''
@@ -439,8 +439,16 @@ if st.checkbox('References'):
                 '(https://www.aha.org/statistics/fast-facts-us-hospitals)')
     st.markdown('[Number of ventilators] '
                 '(https://www.centerforhealthsecurity.org/resources/COVID-19/COVID-19-fact-sheets/200214-VentilatorAvailability-factsheet.pdf)')
+    st.markdown('[Universal Screening for SARS-CoV-2](https://www.nejm.org/doi/10.1056/NEJMc2009316)')
+
     st.subheader('On the news')
     st.markdown('https://www.mercurynews.com/2020/04/11/when-coronavirus-kills-its-like-death-by-drowning-and-doctors-disagree-on-best-treatment/')
     st.markdown('https://www.statnews.com/2020/04/08/doctors-say-ventilators-overused-for-covid-19/')
     st.markdown('https://www.uchicagomedicine.org/forefront/patient-care-articles/helmet-based-ventilation-is-superior-to-face-mask-for-patients-with-respiratory-distress')
     st.markdown('https://www.cnn.com/2020/04/17/asia/china-wuhan-coronavirus-death-toll-intl-hnk/index.html')
+
+if st.checkbox('Changelog'):
+    st.markdown('2020/04/22 Big change on the default parameters about rates using the New York study, which suggests'
+                'asymptomatic rate is 88 percent and death rate is 1 percent. This is now inline with the Chinese study. '
+                'We only need to divide every rate in Chinese study by 2.3. So hospitalized reduced to 6 pct and ICU '
+                'rate to 2.2 pct')
