@@ -446,9 +446,12 @@ if st.checkbox('References'):
     st.markdown('https://www.statnews.com/2020/04/08/doctors-say-ventilators-overused-for-covid-19/')
     st.markdown('https://www.uchicagomedicine.org/forefront/patient-care-articles/helmet-based-ventilation-is-superior-to-face-mask-for-patients-with-respiratory-distress')
     st.markdown('https://www.cnn.com/2020/04/17/asia/china-wuhan-coronavirus-death-toll-intl-hnk/index.html')
+    st.markdown('I never believe that some days I see this long sad story in [New Yorker]'
+                '(https://www.newyorker.com/news/our-local-correspondents/the-body-collectors-of-the-coronavirus-pandemic)'
+                )
 
 if st.checkbox('Changelog'):
-    st.markdown('2020/04/22 Big change on the default parameters about rates using the New York study, which suggests'
-                'asymptomatic rate is 88 percent and death rate is 1 percent. This is now inline with the Chinese study. '
-                'We only need to divide every rate in Chinese study by 2.3. So hospitalized reduced to 6 pct and ICU '
-                'rate to 2.2 pct')
+    st.markdown('2020/04/22 Big change on the default parameters about rates using the New York study, which suggests '
+                'asymptomatic rate is 88 percent and death rate is 1 percent. This is now in line with the Chinese study'
+                ' . We only need to divide every rate in Chinese study by 2.3. So hospitalized reduced to 6 pct and ICU'
+                ' rate to 2.2 pct')
