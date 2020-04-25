@@ -418,3 +418,15 @@ def append_row_2_logs(row, log_file='logs/model_params_logs.csv'):
         # Add contents of list as last row in the csv file
         csv_writer.writerow(row)
 
+
+def get_table_download_link(df, filename="data.csv"):
+    """Generates a link allowing the data in a given panda dataframe to be downloaded
+    in:  dataframe
+    out: href string
+    """
+    import base64
+    csv = df.to_csv(index=True)
+    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
+    href = f'<a href="data:file/csv;base64,{b64}" download="{filename}" >Download csv file</a>'
+    return href
+

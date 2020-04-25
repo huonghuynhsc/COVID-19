@@ -134,6 +134,8 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
         st.plotly_chart(fig)
 
     st.subheader('Estimated Cases and Essential Resources')
+    st.markdown('Since health care systems vary widely between geographic location, if this is used for planning, please'
+                ' check the advance box on the sidebar to update with the appropriate parameters')
     fig = daily[metrics].drop(columns=['ICU', 'hospital_beds'], errors='ignore').iplot(asFigure=True)
     x = daily.index
     y_upper = daily.upper_bound.values
@@ -193,8 +195,13 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
     st.plotly_chart(fig)
 
     if show_data:
-        st.subheader('Raw Data')
+        st.subheader('Raw Output Data')
+        st.markdown(mu.get_table_download_link(daily, filename= 'daily_'+local+'_'+str(dt.date.today())+'.csv'),
+                    unsafe_allow_html=True)
         st.write('Daily metrics', daily)
+        st.markdown(mu.get_table_download_link(cumulative,
+                                               filename='cumulative_' + local + '_' + str(dt.date.today()) + '.csv'),
+                    unsafe_allow_html=True)
         st.write('Cumulative metrics', cumulative)
     mu.append_row_2_logs([dt.datetime.today(), scope, local, model_beta], 'logs/fitted_models.csv')
 
@@ -230,7 +237,7 @@ metrics = st.sidebar.multiselect('Which metrics you like to calculate?',
 
 #metrics = ['death', 'predicted_death', 'infected', 'symptomatic', 'hospitalized', 'ICU', 'hospital_beds']
 show_debug = st.sidebar.checkbox('Show fitted log death', value=True)
-show_data = st.sidebar.checkbox('Show raw data')
+show_data = st.sidebar.checkbox('Show raw output data')
 if st.sidebar.checkbox('Advance: change assumptions'):
     if st.sidebar.checkbox('Change rates'):
         mu.DEATH_RATE = st.sidebar.slider('Overall death rate', value=mu.DEATH_RATE,
