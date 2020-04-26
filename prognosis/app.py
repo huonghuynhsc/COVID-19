@@ -447,6 +447,11 @@ if st.checkbox('References'):
     st.markdown('[Number of ventilators] '
                 '(https://www.centerforhealthsecurity.org/resources/COVID-19/COVID-19-fact-sheets/200214-VentilatorAvailability-factsheet.pdf)')
     st.markdown('[Universal Screening for SARS-CoV-2](https://www.nejm.org/doi/10.1056/NEJMc2009316)')
+    st.markdown('[All the cool charts](https://ourworldindata.org/coronavirus)')
+    st.markdown('[Global Covid-19 Case Fatality Rates from Oxford]'
+                '(https://www.cebm.net/covid-19/global-covid-19-case-fatality-rates/)')
+    st.markdown('[Lancet: estimate the severity of coronavirus disease 2019: a model based analysis]'
+                '(https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30243-7/fulltext)')
 
     st.subheader('On the news')
     st.markdown('https://www.mercurynews.com/2020/04/11/when-coronavirus-kills-its-like-death-by-drowning-and-doctors-disagree-on-best-treatment/')
@@ -456,6 +461,7 @@ if st.checkbox('References'):
     st.markdown('I never believe that some days I see this long sad story in [New Yorker]'
                 '(https://www.newyorker.com/news/our-local-correspondents/the-body-collectors-of-the-coronavirus-pandemic)'
                 )
+
 
 if st.checkbox('Changelog'):
     st.markdown('2020/04/22 Big change on the default parameters about rates using the New York study, which suggests '
