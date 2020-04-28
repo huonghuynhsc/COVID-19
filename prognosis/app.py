@@ -7,15 +7,15 @@ import cufflinks as cf
 cf.go_offline()
 py_offline.__PLOTLY_OFFLINE_INITIALIZED = True
 
-mu.DEATH_RATE = 1.0
-mu.ICU_RATE = 2.2
-mu.HOSPITAL_RATE = 6.0
-mu.SYMPTOM_RATE = 20.0
-mu.INFECT_2_HOSPITAL_TIME = 12
-mu.HOSPITAL_2_ICU_TIME = 2
-mu.ICU_2_DEATH_TIME = 5
-mu.ICU_2_RECOVER_TIME = 11
-mu.NOT_ICU_DISCHARGE_TIME = 7
+mu.DEATH_RATE = 0.36
+mu.ICU_RATE = 0.78
+mu.HOSPITAL_RATE = 2.18
+mu.SYMPTOM_RATE = 10.2
+mu.INFECT_2_HOSPITAL_TIME = 11
+mu.HOSPITAL_2_ICU_TIME = 4
+mu.ICU_2_DEATH_TIME = 4
+mu.ICU_2_RECOVER_TIME = 7
+mu.NOT_ICU_DISCHARGE_TIME = 5
 
 st.title('Covid-19 Prognosis using death cases')
 hide_menu_style = """
@@ -24,8 +24,8 @@ hide_menu_style = """
         </style>
         """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
-st.markdown('Our answer to understand COVID-19: how many deaths in the future, the real infected number'
-            ', how many hospital beds or ICU needed. In every countries and US states. ')
+st.markdown('COVID-19: How many deaths in the future? The real infected number? '
+            ' How many hospital beds or ICU needed? In every countries and US states. ')
 
 def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_debug, show_data):
     data_load_state = st.text('Forecasting...')
@@ -160,7 +160,7 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
     fig.update_layout(
         title="Daily",
         hovermode='x',
-        legend_title='<b> Estimated Cases </b>',
+        legend_title='<b> Number of people </b>',
     )
 
     st.plotly_chart(fig)
@@ -189,7 +189,7 @@ def main(scope, local, lockdown_date, forecast_fun, debug_fun, metrics, show_deb
     fig.update_layout(
         title="Cumulative",
         hovermode='x',
-        legend_title='<b> Estimated Cases </b>',
+        legend_title='<b> Number of people </b>',
     )
 
     st.plotly_chart(fig)
@@ -241,13 +241,13 @@ show_data = st.sidebar.checkbox('Show raw output data')
 if st.sidebar.checkbox('Advance: change assumptions'):
     if st.sidebar.checkbox('Change rates'):
         mu.DEATH_RATE = st.sidebar.slider('Overall death rate', value=mu.DEATH_RATE,
-                                       min_value=0.1, max_value=100.0, step=0.1)
+                                       min_value=0.01, max_value=10.0, step=0.01)
         mu.ICU_RATE = st.sidebar.slider('ICU rate', value=max(mu.ICU_RATE, mu.DEATH_RATE),
-                                       min_value=mu.DEATH_RATE, max_value=100.0, step=0.1)
+                                       min_value=mu.DEATH_RATE, max_value=15.0, step=0.01)
         mu.HOSPITAL_RATE = st.sidebar.slider('Hospitalized rate', value=max(mu.ICU_RATE, mu.HOSPITAL_RATE),
-                                       min_value=mu.ICU_RATE, max_value=100.0, step=0.1)
+                                       min_value=mu.ICU_RATE, max_value=20.0, step=0.01)
         mu.SYMPTOM_RATE = st.sidebar.slider('Symptomatic rate', value=max(mu.SYMPTOM_RATE, mu.HOSPITAL_RATE),
-                                       min_value=mu.HOSPITAL_RATE, max_value=100.0, step=0.1)
+                                       min_value=mu.HOSPITAL_RATE, max_value=25.0, step=0.01)
     if st.sidebar.checkbox('Change time'):
         mu.INFECT_2_HOSPITAL_TIME = st.sidebar.slider('Time to hospitalized since infected',
                                                       value=mu.INFECT_2_HOSPITAL_TIME, min_value=1, max_value=21)
@@ -286,16 +286,17 @@ if st.checkbox('About the model'):
             (https://www.nytimes.com/2020/04/10/nyregion/new-york-coronavirus-death-count.html), especially near peak.  
             It will be used to project other metrics under these [assumptions]
             (https://midasnetwork.us/covid-19/) for Covid19:  
-            - The overall case fatality rate: 1 percent.    
-            - Patients need ICU: 2.2 percent (critical)  
-            - Patients need hospitalized: 6 percent (severe)  
-            - Patients with symptom: 20 percent   
-            - Time to hospitalized since infectected: 12 days (5 days incubation and 7 days from symptom to severe)  
-            - Time to ICU since hospitalized: 2 days (assume only severe case needs to be hospitalized)  
-            - Time to death since ICU use: 5 days  
-            - Time to recover since ICU use: 11 days  
-            - 7 days discharge if not in ICU or coming back from ICU  
-            Average ICU time use: 10 (included both dead (5) and alive(11)): (5+11*4)/5  
+            - The infected fatality rate ([IFR](https://www.cebm.net/covid-19/global-covid-19-case-fatality-rates/)): 
+            0.36 percent     
+            - Patients need ICU: 0.78 percent (critical)  
+            - Patients need hospitalized: 2.18 percent (severe)  
+            - Patients with symptom: 10.2 percent   
+            - Time to hospitalized since infectected: 11 days (4 days incubation and 7 days from symptom to severe)  
+            - Time to ICU since hospitalized: 4 days (assume only severe case needs to be hospitalized)  
+            - Time to death since ICU use: 4 days  
+            - Time to recover since ICU use: 7 days  
+            - 5 days discharge if not in ICU or coming back from ICU  
+            Average ICU time use: 5.6 (included both dead (4) and alive(7))
             Only ICU (critical) patients can develop death  
             
             [Here]
@@ -304,27 +305,29 @@ if st.checkbox('About the model'):
             In the assumptions, we mostly use the lower range from medical literature
             because we want to calculate the minimum ICU and hospital beds needed. These assumptions are not valid in
             local where resource is limited, while people die sooner and more often on ICU just because of not enough
-            ICU to put people on. E.g. Iran, Italy, New York when dead cases peak.''')
+            ICU to put people on. E.g. Iran, Italy, New York when dead cases peak. These also provide higher number
+            on ICU and hospital beds needed if lots of patients dying out of hospital as the undercount link above.''')
     st.subheader('Projections')
     st.markdown('''
-            1. Total number of infection at large: death*100 (not too meaningful) or infected rate in population 
+            1. Total number of infection at large: death*278 (not too meaningful) or infected rate in population 
             (for individual and company to quantify risk of infection, for public health dept to declare herd immunity, 
             relax lock down measurements).
             This has a **20 days lag**, ie. this number is of 20 days ago. 
-            Only in total lockdown setting, we can use the cummulative death from day 20th times 100 to get 
+            Only in total lockdown setting, we can use the cummulative death from day 20th times 278 to get 
             total number of infection at large accurately. 
             Other alternative is whole population testing to get this number immediately. 
             2. With a correct forecast on number of death, we can get the forecast for number of hospital beds needed. 
             This is  used to build more hospital beds in advance.
-            Each new death equal to 6 hospitalized (5+2)7 days before the death and continue for 10 days
-            (using the 6% hospital rate and 1% death rate and 10 days average hospitalized and 
-            5 days from ICU to death, 2 days from hospital to ICU)
+            Each new death equal to 6 hospitalized (4+4)8 days before the death and continue for [12 days]
+            (https://www.nejm.org/doi/full/10.1056/NEJMoa2002032)
+            (using the 2.78% hospital rate and 0.36% death rate and 12 days average hospitalized and 
+            4 days from ICU to death, 4 days from hospital to ICU)
             3. With a correct forecast number of death, we can get the forecast for number of ICU needed. 
             This is used to prepare ICU and buying ventilators or prepare for hospital white flags moment, 
             when doctors have to decide who to treat and who left to death due to constraint on ICU, ventilator. 
             This is also needed to prepare for social unrest.
-            Each new death equal to 2.2 ICU beds 5 days before the death and continue for 10 days 
-            (using the 2.2% ICU rate and 1% death rate and 10 days average ICU used)
+            Each new death equal to 2.2 ICU beds 4 days before the death and continue for 6 days 
+            (using the 0.78% ICU rate and 0.36% death rate and 5.6 days average ICU used)
             ''')
     st.subheader('Forecasting death')
     st.markdown('''
@@ -333,7 +336,7 @@ if st.checkbox('About the model'):
     After a log transform, it becomes linear: $log(d(t))=logb+t*loga$ , so we can use linear regression to 
     provide forecast.   
     We actually use robust linear regressor to avoid data anomaly in death reporting.  
-    There are two seperate linear curves, one before the lockdown is effective (21 days after lockdown) and one after.
+    There are two seperate linear curves, one before the lockdown is effective (20 days after lockdown) and one after.
     For using this prediction to infer back the other metrics (infected cases, hospital, ICU, etc..) only the before
     curve is used and valid. If we assume there is no new infection after lock down (perfect lockdown), the after
     curve only depends on the distribution of time to death since ICU. Since this is unknown, we have to fit the second
@@ -350,19 +353,21 @@ if st.checkbox('About the model'):
             
             
             0. ***Do not use only confirmed case to make decision***. It is misleading and distorted by testing capicity
-            1. Country with severe testing constraint will see death rate lurking around 10-15%, 
-            which is 1% death/6% hospitalized. E.g. Italy, Spain, Iran at the beginning. 
-            While country with enough testing for all symptomatic patients see rate less than 5% (1%/20%).
-            And country that can test most of potential patients, through contact tracing like South Korea and Germany,
-            can get closer to 1%. It is very hard to get under 1% unless an effective cure is in hand. Maybe Vietnam?   
+            1. Country with severe testing constraint will see death rate, case fatality rate(CFR) lurking around 10-15%
+            , which is 0.36% death/2.78% hospitalized. E.g. Belgium, France, UK, Italy, Spain, Iran, .. [Link]
+            (https://www.cebm.net/covid-19/global-covid-19-case-fatality-rates/). 
+            While country with enough testing for all symptomatic patients see rate around 3.5% (0.36%/10.2%), Germany
+            And country that can test most of potential patients, through contact tracing like Hong Kong,
+            can get closer to 0.36%. It is very hard to get under 0.36% unless an effective cure is in hand. 
+            Maybe Vietnam?   
             2. After lock down, we need at least 15 days to see daily new cases peaks and around 20 days to see daily 
             new deaths peak, which is just in the most effective lock down. 
             For a less successful one, or severe limit on testing, this number of lag day is higher on new cases and 
             deaths.           
-            3. The death peak is about 5 days after the cases peak, but cases depends on testing.   
+            3. The death peak is about 4 days after the cases peak, but cases depends on testing.   
             4. It needs about a month from the peak for new cases completely dissipate. 
             The number of death is also slow down but have a fat tail and a about 20 days longer than the cases tail.            
-            5. The above does not apply to country using widespread testing in place of SIP/lockdown like Korea.            
+            5. The above does not apply to country using widespread testing in place of SIP/lockdown like South Korea.            
             6. When no ICU, ventilator available, death rate can increase at most 2.2 times
             ''')
     st.subheader('TODO')
@@ -425,9 +430,10 @@ if st.checkbox('Medical myths'):
     st.subheader('How to prevent the transmission?')
     st.markdown('''
     The main thing this website show is that lockdown is actually working. So follow the lock down guideline, 
-    particularly avoid close air spaces with lots of people, such as airplane, subway, church, etc.., 
+    particularly avoid [close air spaces](https://wwwnc.cdc.gov/eid/article/26/7/20-0764_article) 
+    with lots of people, such as airplane, subway, church, air conditioning restaurant, etc.., 
     and ***wear mask***.''')
-    st.markdown('***Splease spread the message and stay safe!***')
+    st.markdown('***Please spread the message and stay safe!***')
     mu.append_row_2_logs([dt.datetime.today(), ], log_file='logs/medical_myths_logs.csv')
 
 if st.checkbox('References'):
@@ -452,6 +458,18 @@ if st.checkbox('References'):
                 '(https://www.cebm.net/covid-19/global-covid-19-case-fatality-rates/)')
     st.markdown('[Lancet: estimate the severity of coronavirus disease 2019: a model based analysis]'
                 '(https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(20)30243-7/fulltext)')
+    st.markdown('2020/04/27 [Clinical Characteristics of Coronavirus Disease 2019 in China]'
+                '(https://www.nejm.org/doi/full/10.1056/NEJMoa2002032)')
+    st.markdown('2020/04/27 [COVID-19 Hospitalization Tracking Project from UMN]'
+                '(https://carlsonschool.umn.edu/mili-misrc-covid19-tracking-project) used to validate ICU and hospital '
+                'bed projection')
+    st.markdown('2020/04/27 [Correlation between HVAC used and infected rates, from a private conversation]'
+                '(https://drive.google.com/drive/folders/1bLWEX8o7LQoLzwegbYpkIJUVNWS_DKlO)')
+    st.markdown('2020/04/27 [Coronavirus Aerosolized Through Talking]'
+                '(https://www.coronavirustoday.com/sars-cov-2-viral-particles-cause-covid-19-disease)')
+    st.markdown('2020/04/27 [Research Letter from CDC: COVID-19 Outbreak Associated with Air Conditioning in Restaurant]'
+                '(https://wwwnc.cdc.gov/eid/article/26/7/20-0764_article)')
+
 
     st.subheader('On the news')
     st.markdown('https://www.mercurynews.com/2020/04/11/when-coronavirus-kills-its-like-death-by-drowning-and-doctors-disagree-on-best-treatment/')
@@ -461,10 +479,17 @@ if st.checkbox('References'):
     st.markdown('I never believe that some days I see this long sad story in [New Yorker]'
                 '(https://www.newyorker.com/news/our-local-correspondents/the-body-collectors-of-the-coronavirus-pandemic)'
                 )
+    st.markdown('2020/04/27 [Coronavirus lingers in air of crowded spaces, new study finds]'
+                '(https://www.mercurynews.com/2020/04/27/coronavirus-lingers-in-air-of-crowded-spaces-new-study-finds/)')
+    st.markdown('2020/04/27 [Air conditioning appears to spread coronavirus—but opening windows could stop it, studies suggest]'
+                '(https://www.msn.com/en-xl/health/coronavirus/air-conditioning-appears-to-spread-coronavirus—but-opening-windows-could-stop-it-studies-suggest/ar-BB12GeD1)')
 
 
 if st.checkbox('Changelog'):
     st.markdown('2020/04/22 Big change on the default parameters about rates using the New York study, which suggests '
                 'asymptomatic rate is 88 percent and death rate is 1 percent. This is now in line with the Chinese study'
                 ' . We only need to divide every rate in Chinese study by 2.3. So hospitalized reduced to 6 pct and ICU'
-                ' rate to 2.2 pct')
+                ' rate to 2.2 pct.')
+    st.markdown('2020/04/27 Further adjust the default parameters about rates using Oxford estimate for IFR, which is '
+                'now at 0.36%. All the other rates are changed accordingly. One extra bonus, our estimates on ICU and '
+                'hospital bed are in the same range with observed numbers now. ')
