@@ -375,7 +375,8 @@ if st.checkbox('About the model'):
     st.markdown('''
             1. Need to understand how long since infection, patient is no longer a source of infection to forecast
             curve after lock down period relaxed.          
-            2. Upgrade the calculation using mean to use distribution if enough data is available.''')
+            2. Upgrade the calculation using mean to use distribution if enough data is available.
+            3. Use SEIR model when number of infected cases near 20% of population''')
 if st.checkbox('Medical myths'):
     st.markdown('I am not a medical doctor. I am a statistician but I strongly believe in this:')
     st.subheader('How Vietnamese doctors treat SARS before and COVID19 now?')
@@ -430,7 +431,7 @@ if st.checkbox('Medical myths'):
     ''')
     st.subheader('How to prevent the transmission?')
     st.markdown('''
-    The main thing this website show is that lockdown is actually working. So follow the lock down guideline, 
+    This website shows that lockdown is actually working. So follow the lock down guideline, 
     particularly avoid [close air spaces](https://wwwnc.cdc.gov/eid/article/26/7/20-0764_article) 
     with lots of people, such as airplane, subway, church, air conditioning restaurant, etc.., 
     and ***wear mask***.''')

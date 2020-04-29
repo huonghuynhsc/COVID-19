@@ -242,7 +242,7 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
         break_points = np.array([data_start_date_idx, data_end_date_idx])
         regr_pw.fit_with_breaks(break_points)
         variance = regr_pw.variance()
-        log_predicted_death_pred_var_oos = variance * np.sqrt(forecast_time_idx[forecast_time_idx > data_end_date_idx] -
+        log_predicted_death_pred_var_oos = variance * (forecast_time_idx[forecast_time_idx > data_end_date_idx] -
                                                        data_end_date_idx)
     elif all(data_time_idx <= 3):
         print("Use default second model due to not enough data")
@@ -258,7 +258,7 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
         # Replace second slope by default value, learning from local with same temperature, transportation
         regr_pw.beta[2]= -0.3
         variance = regr_pw.variance()
-        log_predicted_death_pred_var_oos = variance*np.sqrt(forecast_time_idx[forecast_time_idx>data_end_date_idx]-
+        log_predicted_death_pred_var_oos = variance*(forecast_time_idx[forecast_time_idx>data_end_date_idx]-
                                                      data_end_date_idx)
         print(regr_pw.variance())
         print(len(forecast_time_idx[forecast_time_idx>data_end_date_idx]))
@@ -273,10 +273,10 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
         break_points = np.array([data_start_date_idx, 0, data_end_date_idx])
         regr_pw.fit_with_breaks(break_points)
         log_predicted_death_pred_var = regr_pw.prediction_variance(forecast_time_idx)
-        #log_predicted_death_pred_var_oos = log_predicted_death_pred_var[sum(forecast_time_idx <= data_end_date_idx):]
-        variance = regr_pw.variance()
-        log_predicted_death_pred_var_oos = variance*np.sqrt(forecast_time_idx[forecast_time_idx>data_end_date_idx]-
-                                                     data_end_date_idx)
+        log_predicted_death_pred_var_oos = log_predicted_death_pred_var[sum(forecast_time_idx <= data_end_date_idx):]
+        #variance = regr_pw.variance()
+        #log_predicted_death_pred_var_oos = variance*(forecast_time_idx[forecast_time_idx>data_end_date_idx]-
+        #                                             data_end_date_idx)
 
     model_beta = regr_pw.beta
 
@@ -305,7 +305,6 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
     log_predicted_death.columns = ['predicted_death']
     log_predicted_death_lower_bound.columns = ['lower_bound']
     log_predicted_death_upper_bound.columns = ['upper_bound']
-    print(regr_pw.fit_breaks)
     return log_predicted_death, log_predicted_death_lower_bound, log_predicted_death_upper_bound, regr_pw.beta
 
 
