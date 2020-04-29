@@ -125,7 +125,8 @@ def get_hospital_beds_from_death(death_row):
     no_ICU_hospital_use = get_impute_from_death(death_row=death_row, 
                                                 periods=no_ICU_hospital_use_periods,
                                                 end_date_offset=no_ICU_hospital_use_end_date_offset)
-    hospital_beds = dead_hospital_use.add(((ICU_RATE-DEATH_RATE)/DEATH_RATE)*ICU_recovered_hospital_use, fill_value=0)                                     .add(((HOSPITAL_RATE-ICU_RATE)/DEATH_RATE)*no_ICU_hospital_use, fill_value=0)
+    hospital_beds = dead_hospital_use.add(((ICU_RATE-DEATH_RATE)/DEATH_RATE)*ICU_recovered_hospital_use, fill_value=0)\
+            .add(((HOSPITAL_RATE-ICU_RATE)/DEATH_RATE)*no_ICU_hospital_use, fill_value=0)
     hospital_beds.columns = ['hospital_beds']
     return hospital_beds
 
@@ -319,6 +320,7 @@ def get_daily_predicted_death(local_death_data, forecast_horizon=60, lockdown_da
     return np.exp(log_daily_predicted_death), np.exp(lb), np.exp(ub), model_beta
 
 
+
 def get_cumulative_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None,
                                    relax_date=None, contain_rate=0.5, test_rate=0.2):
     daily, lb, ub, model_beta = get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date,
@@ -351,12 +353,22 @@ def get_daily_metrics_from_death_data(local_death_data, forecast_horizon=60, loc
 
 def get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon=60, lockdown_date=None,
                                            relax_date=None, contain_rate=0.5, test_rate=0.2):
-    daily_metrics = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date,
+    daily_metrics, model_beta = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date,
                                                       relax_date, contain_rate, test_rate)
     cumulative_metrics = daily_metrics.drop(columns=['ICU', 'hospital_beds']).cumsum()
+    # data_end_date = max(local_death_data.index)
+    # cumulative_metrics['lower_bound'] = daily_metrics['lower_bound']
+    # cumulative_metrics['lower_bound'].loc[local_death_data.index] = np.nan
+    # cumulative_metrics['lower_bound'].loc[data_end_date] = local_death_data.loc[data_end_date][0]
+    # cumulative_metrics['lower_bound'] = cumulative_metrics['lower_bound'].cumsum()
+    # cumulative_metrics['upper_bound'] = daily_metrics['upper_bound']
+    # cumulative_metrics['upper_bound'].loc[local_death_data.index] = np.nan
+    # cumulative_metrics['upper_bound'].loc[data_end_date] = local_death_data.loc[data_end_date][0]
+    # cumulative_metrics['upper_bound'] = cumulative_metrics['upper_bound'].cumsum()
     cumulative_metrics['ICU'] = daily_metrics['ICU']
     cumulative_metrics['hospital_beds'] = daily_metrics['hospital_beds']
-    return cumulative_metrics
+
+    return cumulative_metrics, model_beta
 
 
 def get_metrics_by_country(country, forecast_horizon=60, lockdown_date=None):
@@ -365,6 +377,7 @@ def get_metrics_by_country(country, forecast_horizon=60, lockdown_date=None):
     cumulative_metrics = daily_metrics.drop(columns=['ICU', 'hospital_beds']).cumsum()
     cumulative_metrics['ICU'] = daily_metrics['ICU']
     cumulative_metrics['hospital_beds'] = daily_metrics['hospital_beds']
+    #cumulative_metrics, model_beta = get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
     return daily_metrics, cumulative_metrics, model_beta
 
 
@@ -430,4 +443,16 @@ def append_row_2_logs(row, log_file='logs/model_params_logs.csv'):
         csv_writer = writer(write_obj)
         # Add contents of list as last row in the csv file
         csv_writer.writerow(row)
+
+
+def get_table_download_link(df, filename="data.csv"):
+    """Generates a link allowing the data in a given panda dataframe to be downloaded
+    in:  dataframe
+    out: href string
+    """
+    import base64
+    csv = df.to_csv(index=True)
+    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
+    href = f'<a href="data:file/csv;base64,{b64}" download="{filename}" >Download csv file</a>'
+    return href
 
