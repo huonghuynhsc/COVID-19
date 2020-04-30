@@ -181,6 +181,7 @@ def get_number_hospital_beds_need(daily_local_death_new):
     for i in range(len(daily_local_death_new)-1):
         hospital_beds = hospital_beds.add(get_hospital_beds_from_death(daily_local_death_new.iloc[i+1]), 
                                           fill_value=0)
+    hospital_beds = hospital_beds.iloc[:-(HOSPITAL_2_ICU_TIME+ICU_2_RECOVER_TIME+NOT_ICU_DISCHARGE_TIME)]
     return hospital_beds
 
 
@@ -191,6 +192,7 @@ def get_number_ICU_need(daily_local_death_new):
     # Run through all days
     for i in range(len(daily_local_death_new)-1):
         ICU_n = ICU_n.add(get_ICU_from_death(daily_local_death_new.iloc[i+1]), fill_value=0)
+    ICU_n = ICU_n.iloc[:-ICU_2_RECOVER_TIME]
     return ICU_n
 
 
@@ -260,7 +262,7 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
         break_points = np.array([data_start_date_idx, 0, forecast_end_date_idx])
         regr_pw.fit_with_breaks(break_points)
         # Replace second slope by default value, learning from local with same temperature, transportation
-        regr_pw.beta[2]= -0.3
+        regr_pw.beta[2]= -0.2
         variance = regr_pw.variance()
         log_predicted_death_pred_var_oos = variance*(forecast_time_idx[forecast_time_idx>data_end_date_idx]-
                                                      data_end_date_idx)
