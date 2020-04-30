@@ -85,7 +85,8 @@ def get_lockdown_date_by_country(country):
     try:
         lockdown_date = pd.to_datetime(get_lockdown_date_global().loc[country][0])
     except KeyError:
-        lockdown_date = dt.date.today()
+        #lockdown_date = dt.date.today()
+        lockdown_date = None
     return lockdown_date
 
 
@@ -97,7 +98,8 @@ def get_lockdown_date_by_state_US(state):
     try:
         lockdown_date = pd.to_datetime(get_lockdown_date_US().loc[state][0])
     except KeyError:
-        lockdown_date = dt.date.today()
+        #lockdown_date = dt.date.today()
+        lockdown_date = None
     return lockdown_date
 
 

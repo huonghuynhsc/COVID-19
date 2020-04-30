@@ -322,13 +322,13 @@ if st.checkbox('About the model'):
             Each new death equal to 6 hospitalized (4+4)8 days before the death and continue for [12 days]
             (https://www.nejm.org/doi/full/10.1056/NEJMoa2002032)
             (using the 2.78% hospital rate and 0.36% death rate and 12 days average hospitalized and 
-            4 days from ICU to death, 4 days from hospital to ICU)
+            4 days from ICU to death, 4 days from hospital to ICU).
             3. With a correct forecast number of death, we can get the forecast for number of ICU needed. 
             This is used to prepare ICU and buying ventilators or prepare for hospital white flags moment, 
             when doctors have to decide who to treat and who left to death due to constraint on ICU, ventilator. 
             This is also needed to prepare for social unrest.
             Each new death equal to 2.2 ICU beds 4 days before the death and continue for 6 days 
-            (using the 0.78% ICU rate and 0.36% death rate and 5.6 days average ICU used)
+            (using the 0.78% ICU rate and 0.36% death rate and 5.6 days average ICU used).
             ''')
     st.subheader('Forecasting death')
     st.markdown('''
@@ -345,38 +345,40 @@ if st.checkbox('About the model'):
     [pwlf](https://jekel.me/piecewise_linear_fit_py/index.html#) with breakpoints set at lockdown effective date.
     
     
-    WARNING: if lockdown_date is not provided, we will default to no lockdown to raise awareness of worst case
-    if no action. If you have info on lock down date please use it to make sure the model provide accurate result
+    WARNING: if no lock down happens, please use end date of the forecast period as lock down date. If you have info on 
+    lock down date please use it to make sure the model provide accurate result.
             ''')
     st.subheader('Implications')
     st.markdown('''
             Implications are observed in data everywhere:  
             
             
-            0. ***Do not use only confirmed case to make decision***. It is misleading and distorted by testing capicity
+            0. ***Do not use only confirmed case to make decision***. It is misleading and distorted by testing capicity.
             1. Country with severe testing constraint will see death rate, case fatality rate(CFR) lurking around 10-15%
-            , which is 0.36% death/2.78% hospitalized. E.g. Belgium, France, UK, Italy, Spain, Iran, .. [Link]
+            , which is 0.36% death/2.78% hospitalized, e.g. Belgium, France, UK, Italy, Spain, Iran, .. [Link]
             (https://www.cebm.net/covid-19/global-covid-19-case-fatality-rates/). 
-            While country with enough testing for all symptomatic patients see rate around 3.5% (0.36%/10.2%), Germany
-            And country that can test most of potential patients, through contact tracing like Hong Kong,
+            While country with enough testing for all symptomatic patients see rate around 3.5% (0.36%/10.2%), e.g. 
+            Germany. Country that can test most of potential patients, through contact tracing like Hong Kong,
             can get closer to 0.36%. It is very hard to get under 0.36% unless an effective cure is in hand. 
             Maybe Vietnam?   
-            2. After lock down, we need at least 15 days to see daily new cases peaks and around 20 days to see daily 
+            2. For most countries, the observed confirmed cases in the chart will be sandwich between symptomatic cases
+            and hospitalized cases.
+            3. After lock down, we need at least 15 days to see daily new cases peaks and around 20 days to see daily 
             new deaths peak, which is just in the most effective lock down. 
             For a less successful one, or severe limit on testing, this number of lag day is higher on new cases and 
             deaths.           
-            3. The death peak is about 4 days after the cases peak, but cases depends on testing.   
-            4. It needs about a month from the peak for new cases completely dissipate. 
-            The number of death is also slow down but have a fat tail and a about 20 days longer than the cases tail.            
-            5. The above does not apply to country using widespread testing in place of SIP/lockdown like South Korea.            
-            6. When no ICU, ventilator available, death rate can increase at most 2.2 times
+            4. The death peak is about 4 days after the cases peak, but number of confirmed cases depends on testing.   
+            5. It needs about a month from the peak for new cases completely dissipate. 
+            The number of death is also slow down but have a fat tail and about 20 days longer than the cases tail.            
+            6. The above does not apply to country using widespread testing in place of SIP/lockdown like South Korea.            
+            7. When no ICU or ventilator available, death rate can increase at most 2.2 times.
             ''')
     st.subheader('TODO')
     st.markdown('''
             1. Need to understand how long since infection, patient is no longer a source of infection to forecast
             curve after lock down period relaxed.          
             2. Upgrade the calculation using mean to use distribution if enough data is available.
-            3. Use SEIR model when number of infected cases near 20% of population''')
+            3. Use SEIR model when number of infected cases near 20% of population.''')
 if st.checkbox('Medical myths'):
     st.markdown('I am not a medical doctor. I am a statistician but I strongly believe in this:')
     st.subheader('How Vietnamese doctors treat SARS before and COVID19 now?')
@@ -391,7 +393,7 @@ if st.checkbox('Medical myths'):
     moment. That is why we see a mild progression, when patient's lung adapts to virus in the air, might suddenly turn to
     a [death end]
     (https://www.mercurynews.com/2020/04/11/when-coronavirus-kills-its-like-death-by-drowning-and-doctors-disagree-on-best-treatment/)
-    ''')
+    .''')
     st.subheader('How does patient die from COVID-19?')
     st.markdown('''
     Short answer: mostly not because of the virus but because of their own immune system, particularly the cytokine 
@@ -443,7 +445,7 @@ if st.checkbox('References'):
                 'Reason we speed up our development. Lots of thing to like. One thing '
                 'we would do differently, the forecasting model.')
     st.markdown('https://www.streamlit.io Fast prototype.')
-    st.markdown('[pwlf](https://jekel.me/piecewise_linear_fit_py/index.html) Key tool for my model')
+    st.markdown('[pwlf](https://jekel.me/piecewise_linear_fit_py/index.html) Key tool for my model.')
     st.markdown('https://www.uptodate.com/contents/coronavirus-disease-2019-covid-19')
     st.markdown('https://midasnetwork.us/covid-19/')
     st.markdown('[Letter from the frontline, Italy]'
@@ -464,7 +466,7 @@ if st.checkbox('References'):
                 '(https://www.nejm.org/doi/full/10.1056/NEJMoa2002032)')
     st.markdown('2020/04/27 [COVID-19 Hospitalization Tracking Project from UMN]'
                 '(https://carlsonschool.umn.edu/mili-misrc-covid19-tracking-project) used to validate ICU and hospital '
-                'bed projection')
+                'bed projection.')
     st.markdown('2020/04/27 [Correlation between HVAC used and infected rates, from a private conversation]'
                 '(https://drive.google.com/drive/folders/1bLWEX8o7LQoLzwegbYpkIJUVNWS_DKlO)')
     st.markdown('2020/04/27 [Coronavirus Aerosolized Through Talking]'
