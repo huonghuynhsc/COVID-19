@@ -42,16 +42,39 @@ from csv import writer
 #NOT_ICU_DISCHARGE_TIME = 7
 
 
-def get_global_death_data(csv_file='../csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'):
-    death_data = pd.read_csv(csv_file)
-    return death_data.rename(index=str, columns={"Country/Region": "Country", "Province/State": "State"})
-
-
-def get_US_death_data(csv_file='../csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv'):
-    death_data = pd.read_csv(csv_file)
-    return death_data.rename(index=str, columns={"Country_Region": "Country", 
-                                                 "Province_State": "State", 
+def get_data(file_template='../csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_{type}_{scope}.csv',
+            type='deaths', scope='global'):
+    """
+    type = enum('deaths', 'confirmed', 'recovered'),
+    scope = enum('global', 'US')
+    """
+    death_data = pd.read_csv(file_template.format(type=type, scope=scope))
+    return death_data.rename(index=str, columns={"Country/Region": "Country",
+                                                 "Province/State": "State",
+                                                 "Country_Region": "Country",
+                                                 "Province_State": "State",
                                                  "Admin2": "County"})
+
+
+def get_data_by_country(country, type='deaths'):
+    global_data = get_data(scope='global', type=type)
+    local_data = global_data.query('Country == "{}"'.format(country)).iloc[:,4:].T.sum(axis=1).to_frame()
+    local_data.index = pd.to_datetime(local_data.index)
+    return local_data[local_data>0].dropna()
+
+
+def get_data_by_state(state, type='deaths'):
+    US_data = get_data(scope='US', type=type)
+    local_data = US_data.query('State == "{}"'.format(state)).iloc[:,12:].T.sum(axis=1).to_frame()
+    local_data.index = pd.to_datetime(local_data.index)
+    return local_data[local_data>0].dropna()
+
+
+def get_data_by_county_and_state(county, state, type='deaths'):
+    US_data = get_data(scope='US', type=type)
+    local_data = US_data.query('County == "{}" and State == "{}"'.format(county, state)).iloc[:,12:].T.sum(axis=1).to_frame()
+    local_data.index = pd.to_datetime(local_data.index)
+    return local_data[local_data>0].dropna()
 
 
 def get_lockdown_date_global(csv_file='data/lockdown_date_country.csv'):
@@ -78,29 +101,8 @@ def get_lockdown_date_by_state_US(state):
     return lockdown_date
 
 
-def get_death_data_by_country(country):
-    global_death_data = get_global_death_data()
-    local_death_data = global_death_data.query('Country == "{}"'.format(country)).iloc[:,4:].T.sum(axis=1).to_frame()
-    local_death_data.index = pd.to_datetime(local_death_data.index)
-    return local_death_data[local_death_data>0].dropna()
-
-
-def get_US_death_data_by_state(state):
-    US_death_data = get_US_death_data()
-    local_death_data = US_death_data.query('State == "{}"'.format(state)).iloc[:,12:].T.sum(axis=1).to_frame()
-    local_death_data.index = pd.to_datetime(local_death_data.index)
-    return local_death_data[local_death_data>0].dropna()
-
-
-def get_US_death_data_by_county_and_state(county, state):
-    US_death_data = get_US_death_data()
-    local_death_data = US_death_data.query('County == "{}" and State == "{}"'.format(county, state)).iloc[:,12:].T.sum(axis=1).to_frame()
-    local_death_data.index = pd.to_datetime(local_death_data.index)
-    return local_death_data[local_death_data>0].dropna()
-
-
-def get_daily_death(local_death_data):
-    return local_death_data.diff().fillna(0)
+def get_daily_data(cum_data):
+    return cum_data.diff().fillna(0)
 
 
 def get_impute_from_death(death_row, periods, end_date_offset=0):
@@ -202,7 +204,7 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
     curve only depends on the distribution of time to death since ICU.
     WARNING: if lockdown_date is not provided, we will default to no lockdown to raise awareness of worst case
     if no action. If you have info on lockdown date please use it to make sure the model provide accurate result'''
-    daily_local_death_new = local_death_data.diff().fillna(0)
+    daily_local_death_new = get_daily_data(local_death_data)
     daily_local_death_new = daily_local_death_new.rolling(3, min_periods=1).mean()
     #shift ahead 1 day to avoid overfitted due to average of exponential value
     #daily_local_death_new = daily_local_death_new.shift(1)
@@ -371,8 +373,11 @@ def get_cumulative_metrics_from_death_data(local_death_data, forecast_horizon=60
 
 
 def get_metrics_by_country(country, forecast_horizon=60, lockdown_date=None):
-    local_death_data = get_death_data_by_country(country)
+    local_death_data = get_data_by_country(country, type='deaths')
+    local_confirmed_data = get_data_by_country(country, type='confirmed')
+    daily_local_confirmed_data = get_daily_data(local_confirmed_data)
     daily_metrics, model_beta = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
+    daily_metrics['confirmed'] = daily_local_confirmed_data
     cumulative_metrics = daily_metrics.drop(columns=['ICU', 'hospital_beds']).cumsum()
     cumulative_metrics['ICU'] = daily_metrics['ICU']
     cumulative_metrics['hospital_beds'] = daily_metrics['hospital_beds']
@@ -382,9 +387,12 @@ def get_metrics_by_country(country, forecast_horizon=60, lockdown_date=None):
 
 def get_metrics_by_state_US(state, forecast_horizon=60, lockdown_date=None,
                             relax_date=None, contain_rate=0.5, test_rate=0.2):
-    local_death_data = get_US_death_data_by_state(state)
+    local_death_data = get_data_by_state(state, type='deaths')
+    local_confirmed_data = get_data_by_state(state, type='confirmed')
+    daily_local_confirmed_data = get_daily_data(local_confirmed_data)
     daily_metrics, model_beta = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date,
                                                                   relax_date, contain_rate, test_rate)
+    daily_metrics['confirmed'] = daily_local_confirmed_data
     cumulative_metrics = daily_metrics.drop(columns=['ICU', 'hospital_beds']).cumsum()
     cumulative_metrics['ICU'] = daily_metrics['ICU']
     cumulative_metrics['hospital_beds'] = daily_metrics['hospital_beds']
@@ -392,8 +400,11 @@ def get_metrics_by_state_US(state, forecast_horizon=60, lockdown_date=None,
 
 
 def get_metrics_by_county_and_state_US(county, state, forecast_horizon=60, lockdown_date=None):
-    local_death_data = get_US_death_data_by_county_and_state(county, state)
+    local_death_data = get_data_by_county_and_state(county, state, type='deaths')
+    local_confirmed_data = get_data_by_county_and_state(county, state, type='confirmed')
+    daily_local_confirmed_data = get_daily_data(local_confirmed_data)
     daily_metrics, model_beta = get_daily_metrics_from_death_data(local_death_data, forecast_horizon, lockdown_date)
+    daily_metrics['confirmed'] = daily_local_confirmed_data
     cumulative_metrics = daily_metrics.drop(columns=['ICU', 'hospital_beds']).cumsum()
     cumulative_metrics['ICU'] = daily_metrics['ICU']
     cumulative_metrics['hospital_beds'] = daily_metrics['hospital_beds']
@@ -401,7 +412,7 @@ def get_metrics_by_county_and_state_US(county, state, forecast_horizon=60, lockd
 
 
 def get_log_daily_predicted_death_by_country(country, forecast_horizon=60, lockdown_date=None):
-    local_death_data = get_death_data_by_country(country)
+    local_death_data = get_data_by_country(country, type='deaths')
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
@@ -413,7 +424,7 @@ def get_log_daily_predicted_death_by_country(country, forecast_horizon=60, lockd
 
 def get_log_daily_predicted_death_by_state_US(state, forecast_horizon=60, lockdown_date=None,
                                               relax_date=None, contain_rate=0.5, test_rate=0.2):
-    local_death_data = get_US_death_data_by_state(state)
+    local_death_data = get_data_by_state(state, type='deaths')
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
@@ -425,7 +436,7 @@ def get_log_daily_predicted_death_by_state_US(state, forecast_horizon=60, lockdo
 
 
 def get_log_daily_predicted_death_by_county_and_state_US(county, state, forecast_horizon=60, lockdown_date=None):
-    local_death_data = get_US_death_data_by_county_and_state(county, state)
+    local_death_data = get_data_by_county_and_state(county, state, type='deaths')
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)

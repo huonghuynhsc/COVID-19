@@ -210,7 +210,7 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
 scope = st.sidebar.selectbox('Country or US State', ['Country', 'State'], index=0)
 if scope=='Country':
     #data_load_state = st.text('Loading data...')
-    death_data = mu.get_global_death_data()
+    death_data = mu.get_data(scope='global', type='deaths')
     #data_load_state.text('Loading data... done!')
     local = st.sidebar.selectbox('Which country do you like to see prognosis', death_data.Country.unique(), index=156)
     lockdown_date = st.sidebar.date_input('When did full lockdown happen? Very IMPORTANT to get accurate prediction',
@@ -219,7 +219,7 @@ if scope=='Country':
     debug_fun = mu.get_log_daily_predicted_death_by_country
 else:
     #data_load_state = st.text('Loading data...')
-    death_data = mu.get_US_death_data()
+    death_data = mu.get_data(scope='US', type='deaths')
     #data_load_state.text('Loading data... done!')
     local = st.sidebar.selectbox('Which US state do you like to see prognosis', death_data.State.unique(), index=9)
     lockdown_date = st.sidebar.date_input('When did full lockdown happen? Very IMPORTANT to get accurate prediction',
@@ -233,9 +233,9 @@ else:
                                                                  ' is interactive.'
 metrics = st.sidebar.multiselect('Which metrics you like to calculate?',
                         ('death', 'predicted_death', 'infected', 'symptomatic',
-                         'hospitalized', 'ICU', 'hospital_beds'),
+                         'hospitalized', 'confirmed', 'ICU', 'hospital_beds'),
                         ['death', 'predicted_death', 'infected', 'symptomatic',
-                         'hospitalized', 'ICU', 'hospital_beds'])
+                         'hospitalized', 'confirmed', 'ICU', 'hospital_beds'])
 forecast_horizon = st.sidebar.slider('Forecast Horizon', value=60, min_value=30, max_value=90)
 show_debug = st.sidebar.checkbox('Show fitted log death', value=True)
 show_data = st.sidebar.checkbox('Show raw output data')
