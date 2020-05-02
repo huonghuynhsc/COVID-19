@@ -253,7 +253,7 @@ else:
 
 
 'You selected: ', local, 'with lock down date: ', lockdown_date, '. Click **Run** on left sidebar to see forecast. Plot' \
-                                                                 ' is interactive.'
+                                                                 ' is interactive. Work best on desktop.'
 forecast_horizon = st.sidebar.slider('Forecast Horizon', value=60, min_value=30, max_value=90)
 show_debug = st.sidebar.checkbox('Show fitted log death', value=True)
 show_data = st.sidebar.checkbox('Show raw output data')
