@@ -138,7 +138,8 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
     st.subheader('Estimated Cases and Essential Resources')
     st.markdown('Since health care systems vary widely between geographic location, if this is used for planning, please'
                 ' check the advance box on the sidebar to update with the appropriate parameters')
-    fig = daily[metrics].drop(columns=['ICU', 'hospital_beds'], errors='ignore').iplot(asFigure=True)
+    fig = daily.drop(columns=['ICU', 'hospital_beds'], errors='ignore')\
+        .drop(columns=['lower_bound', 'upper_bound'], errors='ignore').iplot(asFigure=True)
     x = daily.index
     y_upper = daily.upper_bound.values
     y_lower = daily.lower_bound.values
@@ -159,6 +160,17 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
     #     showlegend=False,
     #     name='Lower Bound'
     # ))
+    for invisible in metrics:
+        fig.update_traces(
+            visible='legendonly',
+            selector=dict(name=invisible)
+        )
+    fig.update_traces(line = dict(dash='dot'))
+    for observe_ln in ['death', 'confirmed']:
+        fig.update_traces(
+            line = dict(dash='solid'),
+            selector=dict(name=observe_ln)
+        )
     fig.update_layout(
         title="Daily",
         hovermode='x',
@@ -167,7 +179,7 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
 
     st.plotly_chart(fig)
 
-    fig = cumulative[metrics].iplot(asFigure=True)
+    fig = cumulative.drop(columns=['lower_bound', 'upper_bound'], errors='ignore').iplot(asFigure=True)
     x = cumulative.index
     y_upper = cumulative.upper_bound.values
     y_lower = cumulative.lower_bound.values
@@ -188,6 +200,17 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
     #     showlegend=False,
     #     name='Lower Bound'
     # ))
+    for invisible in metrics:
+        fig.update_traces(
+            visible='legendonly',
+            selector=dict(name=invisible)
+        )
+    fig.update_traces(line=dict(dash='dot'))
+    for observe_ln in ['death', 'confirmed']:
+        fig.update_traces(
+            line=dict(dash='solid'),
+            selector=dict(name=observe_ln)
+        )
     fig.update_layout(
         title="Cumulative",
         hovermode='x',
@@ -231,11 +254,6 @@ else:
 
 'You selected: ', local, 'with lock down date: ', lockdown_date, '. Click **Run** on left sidebar to see forecast. Plot' \
                                                                  ' is interactive.'
-metrics = st.sidebar.multiselect('Which metrics you like to calculate?',
-                        ('death', 'predicted_death', 'infected', 'symptomatic',
-                         'hospitalized', 'confirmed', 'ICU', 'hospital_beds'),
-                        ['death', 'predicted_death', 'infected', 'symptomatic',
-                         'hospitalized', 'confirmed', 'ICU', 'hospital_beds'])
 forecast_horizon = st.sidebar.slider('Forecast Horizon', value=60, min_value=30, max_value=90)
 show_debug = st.sidebar.checkbox('Show fitted log death', value=True)
 show_data = st.sidebar.checkbox('Show raw output data')
@@ -260,6 +278,12 @@ if st.sidebar.checkbox('Advance: change assumptions'):
                                                       value=mu.ICU_2_RECOVER_TIME, min_value=1, max_value=30)
         mu.NOT_ICU_DISCHARGE_TIME = st.sidebar.slider('Time to discharge',
                                                       value=mu.NOT_ICU_DISCHARGE_TIME, min_value=1, max_value=21)
+metrics = ['infected']
+if st.sidebar.checkbox('Hide some metrics'):
+    metrics = st.sidebar.multiselect('Which metrics you like to be invisible by default?',
+                                     ('death', 'predicted_death', 'infected', 'symptomatic',
+                                      'hospitalized', 'confirmed', 'ICU', 'hospital_beds'),
+                                     metrics)
 
 if st.sidebar.button('Run'):
     main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug,show_data)
@@ -267,19 +291,17 @@ if st.sidebar.button('Run'):
                     mu.SYMPTOM_RATE, mu.INFECT_2_HOSPITAL_TIME, mu.HOSPITAL_2_ICU_TIME, mu.ICU_2_DEATH_TIME, 
                     mu.ICU_2_RECOVER_TIME, mu.NOT_ICU_DISCHARGE_TIME]
     mu.append_row_2_logs(model_params)
+st.sidebar.subheader('Authors')
+st.sidebar.info(
+"""
+Quoc Tran - Principal Data Scientist WalmartLabs - [LinkedIn](https://www.linkedin.com/in/quoc-tran-wml)   
+Huong Huynh - Data Scientist - Virtual Power Systems - [LinkedIn](https://www.linkedin.com/in/huonghuynhsjsu) 
+Feedback: hthuongsc@gmail.com  
+[Gibhub](https://github.com/QuocTran/COVID-19.git)  
+Data Source: [JHU](https://coronavirus.jhu.edu/map.html)
+"""
+)
 
-if st.checkbox('Show authors'):
-    st.subheader('Authors')
-    st.markdown('[Quoc Tran](https://www.linkedin.com/in/quoc-tran-wml) - Principal Data Scientist - WalmartLabs')
-    st.markdown('[Huong Huynh](https://www.linkedin.com/in/huonghuynhsjsu) - Data Scientist - Virtual Power Systems')
-    st.markdown('Feedback: hthuongsc@gmail.com')
-    st.markdown('[Gibhub](https://github.com/QuocTran/COVID-19.git)')
-    if st.checkbox('Leave feedback directly'):
-        feedback = st.text_input('Write your feedback directly hear, include your email if you would like a reply')
-        if feedback != '':
-            mu.append_row_2_logs([dt.datetime.today(), feedback], log_file='logs/feedback_logs.csv')
-if st.checkbox('Show Datasource'):
-    st.markdown('https://coronavirus.jhu.edu/map.html')
 if st.checkbox('About the model'):
     st.subheader('Assumptions')
     st.markdown('''
