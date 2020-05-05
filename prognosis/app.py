@@ -495,6 +495,7 @@ if st.checkbox('References'):
                 '(https://www.coronavirustoday.com/sars-cov-2-viral-particles-cause-covid-19-disease)')
     st.markdown('2020/04/27 [Research Letter from CDC: COVID-19 Outbreak Associated with Air Conditioning in Restaurant]'
                 '(https://wwwnc.cdc.gov/eid/article/26/7/20-0764_article)')
+    st.markdown('2020/05/04 [Great resources on data](http://covid19.laiyaconsulting.com/source)')
 
 
     st.subheader('On the news')
