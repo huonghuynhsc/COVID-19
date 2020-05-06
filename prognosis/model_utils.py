@@ -347,9 +347,9 @@ def get_daily_metrics_from_death_data(local_death_data, forecast_horizon=60, loc
             get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date,
                                       relax_date, contain_rate)
     upper_length_death = daily_predicted_death_ub - daily_predicted_death
-    upper_length_derived = int(upper_length_death*1/np.sqrt(test_rate))
+    upper_length_derived = (upper_length_death*1/np.sqrt(test_rate)).astype('int', errors='ignore')
     lower_length_death = daily_predicted_death - daily_predicted_death_lb
-    lower_length_derived = int(lower_length_death * 1 / np.sqrt(test_rate))
+    lower_length_derived = (lower_length_death * 1 / np.sqrt(test_rate)).astype('int', errors='ignore')
 
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
@@ -359,11 +359,11 @@ def get_daily_metrics_from_death_data(local_death_data, forecast_horizon=60, loc
     daily_hospital_beds_need = get_number_hospital_beds_need(daily_predicted_death)
     daily_ICU_need = get_number_ICU_need(daily_predicted_death)
 
-    daily_infected_cases_new_lb = daily_infected_cases_new - get_infected_cases(lower_length_derived)
-    daily_symptomatic_cases_new_lb = daily_symptomatic_cases_new - get_symptomatic_cases(lower_length_derived)
-    daily_hospitalized_cases_new_lb = daily_hospitalized_cases_new_lb - get_hospitalized_cases(lower_length_derived)
-    daily_hospital_beds_need_lb = daily_hospital_beds_need - get_number_hospital_beds_need(lower_length_derived)
-    daily_ICU_need_lb = daily_hospital_beds_need - get_number_ICU_need(lower_length_derived)
+    # daily_infected_cases_new_lb = daily_infected_cases_new - get_infected_cases(lower_length_derived)
+    # daily_symptomatic_cases_new_lb = daily_symptomatic_cases_new - get_symptomatic_cases(lower_length_derived)
+    # daily_hospitalized_cases_new_lb = daily_hospitalized_cases_new - get_hospitalized_cases(lower_length_derived)
+    # daily_hospital_beds_need_lb = daily_hospital_beds_need - get_number_hospital_beds_need(lower_length_derived)
+    # daily_ICU_need_lb = daily_hospital_beds_need - get_number_ICU_need(lower_length_derived)
 
     return pd.concat([daily_local_death_new,
                       daily_predicted_death,
