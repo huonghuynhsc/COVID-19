@@ -290,7 +290,7 @@ if st.sidebar.checkbox('Hide some metrics'):
 back_test = st.sidebar.checkbox('Run back test to evaluate')
 last_data_date = dt.date.today()
 if back_test:
-    last_data_date = st.sidebar.date_input('Last date of data', dt.date.today()+dt.timedelta(-10))
+    last_data_date = st.sidebar.date_input('Last date of data', dt.date.today()+dt.timedelta(-7))
     'Run back test with data up to', last_data_date
 
 if st.sidebar.button('Run'):
