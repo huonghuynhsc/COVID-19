@@ -27,11 +27,13 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 st.markdown('COVID-19: How many deaths in the future? The real infected number? '
             ' How many hospital beds or ICU needed? In every countries and US states. ')
 
-def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug, show_data):
+def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug, show_data,
+         back_test, last_data_date):
     data_load_state = st.text('Forecasting...')
     try:
         daily, cumulative, model_beta = forecast_fun(local,
-                                                     forecast_horizon=forecast_horizon, lockdown_date=lockdown_date)
+                                                     forecast_horizon=forecast_horizon, lockdown_date=lockdown_date,
+                                                     back_test=back_test, last_data_date=last_data_date)
     except ValueError:
         st.error('Not enough fatality data to provide prognosis, please check input and lockdown date')
         return None
@@ -104,7 +106,8 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
 
 
     if show_debug:
-        log_fit, _ = debug_fun(local, forecast_horizon=forecast_horizon, lockdown_date=lockdown_date)
+        log_fit, _ = debug_fun(local, forecast_horizon=forecast_horizon, lockdown_date=lockdown_date,
+                               back_test=back_test, last_data_date=last_data_date)
         fig = log_fit.rename(columns={'death':'observed', 'predicted_death': 'predicted'})\
             .drop(columns=['lower_bound', 'upper_bound'], errors='ignore').iplot(asFigure=True)
         x = log_fit.index
@@ -284,12 +287,18 @@ if st.sidebar.checkbox('Hide some metrics'):
                                      ('death', 'predicted_death', 'infected', 'symptomatic',
                                       'hospitalized', 'confirmed', 'ICU', 'hospital_beds'),
                                      metrics)
+back_test = st.sidebar.checkbox('Run back test to evaluate')
+last_data_date = dt.date.today()
+if back_test:
+    last_data_date = st.sidebar.date_input('Last date of data', dt.date.today()+dt.timedelta(-10))
+    'Run back test with data up to', last_data_date
 
 if st.sidebar.button('Run'):
-    main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug,show_data)
+    main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug,show_data,
+         back_test, last_data_date)
     model_params = [dt.datetime.today(), scope, local, lockdown_date, mu.DEATH_RATE, mu.ICU_RATE, mu.HOSPITAL_RATE,
                     mu.SYMPTOM_RATE, mu.INFECT_2_HOSPITAL_TIME, mu.HOSPITAL_2_ICU_TIME, mu.ICU_2_DEATH_TIME, 
-                    mu.ICU_2_RECOVER_TIME, mu.NOT_ICU_DISCHARGE_TIME]
+                    mu.ICU_2_RECOVER_TIME, mu.NOT_ICU_DISCHARGE_TIME, back_test, last_data_date]
     mu.append_row_2_logs(model_params)
 st.sidebar.subheader('Authors')
 st.sidebar.info(
@@ -522,3 +531,4 @@ if st.checkbox('Changelog'):
     st.markdown('2020/04/27 Further adjust the default parameters about rates using Oxford estimate for IFR, which is '
                 'now at 0.36%. All the other rates are changed accordingly. One extra bonus, our estimates on ICU and '
                 'hospital bed are in the same range with observed numbers now. ')
+    st.markdown('2020/05/07 Added back test to visually evaluate model sensitivity to new data point')
