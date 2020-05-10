@@ -1,5 +1,6 @@
 import streamlit as st
 import datetime as dt
+import numpy as np
 import model_utils as mu
 import plotly.graph_objects as go
 import plotly.offline as py_offline
@@ -46,6 +47,7 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
     x = daily.index
     y_upper = daily.upper_bound.values
     y_lower = daily.lower_bound.values
+
     fig.add_trace(go.Scatter(
         x=x,
         y=y_upper,
@@ -65,6 +67,18 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
         legendgroup='Confidence Interval',
         name='Lower Bound'
     ))
+    if back_test:
+        max_y = np.nanmax(y_upper)
+        fig.add_trace(go.Scatter(
+            x=[last_data_date,last_data_date],
+            y=[0, max_y],
+            opacity=0.5,
+            line_color='grey',
+            mode='lines',
+            hovertext=str(last_data_date),
+            hoverinfo="x+name",
+            name='Last day of fitted data'
+        ))
     fig.update_layout(
         title="Daily",
         yaxis_title="Death",
@@ -95,6 +109,18 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
         legendgroup='CI',
         name='Lower Bound'
     ))
+    if back_test:
+        max_y = np.nanmax(y_upper)
+        fig.add_trace(go.Scatter(
+            x=[last_data_date,last_data_date],
+            y=[0, max_y],
+            opacity=0.5,
+            line_color='grey',
+            mode='lines',
+            hovertext=str(last_data_date),
+            hoverinfo="x+name",
+            name='Last day of fitted data'
+        ))
     fig.update_layout(
         title="Cumulative",
         yaxis_title="Death",
@@ -130,6 +156,18 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
             legendgroup='CI',
             name='Lower Bound'
         ))
+        if back_test:
+            max_y = np.nanmax(y_upper)
+            fig.add_trace(go.Scatter(
+                x=[last_data_date, last_data_date],
+                y=[0, max_y],
+                opacity=0.5,
+                line_color='grey',
+                mode='lines',
+                hovertext=str(last_data_date),
+                hoverinfo="x+name",
+                name='Last day of fitted data'
+            ))
         fig.update_layout(
             title="Fitted log of daily death before and after lock down being effective",
             yaxis_title="Log Daily Death",
@@ -174,6 +212,18 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
             line = dict(dash='solid'),
             selector=dict(name=observe_ln)
         )
+    if back_test:
+        max_y = np.nanmax(y_upper)
+        fig.add_trace(go.Scatter(
+            x=[last_data_date,last_data_date],
+            y=[0, max_y],
+            opacity=0.5,
+            line_color='grey',
+            mode='lines',
+            hovertext=str(last_data_date),
+            hoverinfo="x+name",
+            name='Last day of fitted data'
+        ))
     fig.update_layout(
         title="Daily",
         hovermode='x',
@@ -214,6 +264,18 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
             line=dict(dash='solid'),
             selector=dict(name=observe_ln)
         )
+    if back_test:
+        max_y = np.nanmax(y_upper)
+        fig.add_trace(go.Scatter(
+            x=[last_data_date, last_data_date],
+            y=[0, max_y],
+            opacity=0.5,
+            line_color='grey',
+            mode='lines',
+            hovertext=str(last_data_date),
+            hoverinfo="x+name",
+            name='Last day of fitted data'
+        ))
     fig.update_layout(
         title="Cumulative",
         hovermode='x',
