@@ -18,14 +18,14 @@ mu.ICU_2_DEATH_TIME = 4
 mu.ICU_2_RECOVER_TIME = 7
 mu.NOT_ICU_DISCHARGE_TIME = 5
 
-st.title('Covid-19 Prognosis using death cases')
+st.title('Covid-19 Prediction')
 hide_menu_style = """
         <style>
         #MainMenu {visibility: hidden;}
         </style>
         """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
-st.markdown('COVID-19: How many deaths in the future? The real infected number? '
+st.markdown('COVID-19:  The prognosis for next 2 months. '
             ' How many hospital beds or ICU needed? In every countries and US states. ')
 
 def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug, show_data,
