@@ -365,7 +365,7 @@ if st.sidebar.button('Run'):
 st.sidebar.subheader('Authors')
 st.sidebar.info(
 """
-Quoc Tran - Principal Data Scientist WalmartLabs - [LinkedIn](https://www.linkedin.com/in/quoc-tran-wml)   
+Quoc Tran  
 Huong Huynh - Data Scientist - Virtual Power Systems - [LinkedIn](https://www.linkedin.com/in/huonghuynhsjsu) 
 Feedback: hthuongsc@gmail.com  
 [Gibhub](https://github.com/QuocTran/COVID-19.git)  
