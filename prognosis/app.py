@@ -80,7 +80,7 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
             name='Last day of fitted data'
         ))
     fig.update_layout(
-        title="Daily",
+        title="Daily " + local,
         yaxis_title="Death",
         hovermode='x',
         legend_title='<b> Death </b>',
@@ -122,7 +122,7 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
             name='Last day of fitted data'
         ))
     fig.update_layout(
-        title="Cumulative",
+        title="Cumulative " + local,
         yaxis_title="Death",
         hovermode='x',
         legend_title='<b> Death </b>'
@@ -352,7 +352,7 @@ if st.sidebar.checkbox('Hide some metrics'):
 back_test = st.sidebar.checkbox('Run back test to evaluate')
 last_data_date = dt.date.today()
 if back_test:
-    last_data_date = st.sidebar.date_input('Last date of data', dt.date.today()+dt.timedelta(-7))
+    last_data_date = st.sidebar.date_input('Last date of data', dt.date.today()+dt.timedelta(-14))
     'Run back test with data up to', last_data_date
 
 if st.sidebar.button('Run'):
