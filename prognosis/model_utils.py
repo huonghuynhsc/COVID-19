@@ -197,7 +197,7 @@ def get_number_ICU_need(daily_local_death_new):
 
 
 def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None,
-                                  relax_date=None, contain_rate=0.5, test_rate=0.2):
+                                  relax_date=None, contain_rate=0.5):
     '''Since this is highly contagious disease. Daily new death, which is a proxy for daily new infected cases
     is model as d(t)=a*d(t-1) or equivalent to d(t) = b*a^(t). After a log transform, it becomes linear.
     log(d(t))=logb+t*loga, so we can use linear regression to provide forecast (use robust linear regressor to avoid
@@ -294,7 +294,7 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
         break_points = np.array([data_start_date_idx, 0, relax_effective_date_idx, forecast_end_date_idx])
         model_beta = np.append(model_beta, ((model_beta[1] + model_beta[2]) * contain_rate +
                                                 model_beta[1] * (1 - contain_rate)) - (model_beta[1] + model_beta[2]))
-        log_predicted_death_pred_var_oos = log_predicted_death_pred_var_oos*((0.2/(test_rate+0.01))**3)
+        log_predicted_death_pred_var_oos = log_predicted_death_pred_var_oos
     log_predicted_death_values = regr_pw.predict(forecast_time_idx, beta=model_beta, breaks=break_points)
     log_predicted_death_pred_var = regr_pw.prediction_variance(forecast_time_idx)
 
@@ -315,29 +315,42 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, lockdow
 
 
 def get_daily_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None,
-                              relax_date=None, contain_rate=0.5, test_rate=0.2):
+                              relax_date=None, contain_rate=0.5):
     log_daily_predicted_death, lb, ub, model_beta = get_log_daily_predicted_death(local_death_data,
                                                                                   forecast_horizon,
                                                                                   lockdown_date,
                                                                                   relax_date,
-                                                                                  contain_rate,
-                                                                                  test_rate)
+                                                                                  contain_rate)
     return np.exp(log_daily_predicted_death), np.exp(lb), np.exp(ub), model_beta
 
 
 
 def get_cumulative_predicted_death(local_death_data, forecast_horizon=60, lockdown_date=None,
-                                   relax_date=None, contain_rate=0.5, test_rate=0.2):
+                                   relax_date=None, contain_rate=0.5):
     daily, lb, ub, model_beta = get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date,
-                                                          relax_date, contain_rate, test_rate)
+                                                          relax_date, contain_rate)
     return daily.cumsum(), lb.cumsum(), ub.cumsum(), model_beta
 
 
 def get_daily_metrics_from_death_data(local_death_data, forecast_horizon=60, lockdown_date=None,
                                       relax_date=None, contain_rate=0.5, test_rate=0.2):
+    """test rate is defined as ratio of confirmed positive cases over all infected cases. A test rate=1 mean
+    we can catch all infected case. In this case there is no uncertainty on the infected case, it is exactly
+    equal confirmed case. When test rate is smaller than 1 the uncertainty is higher. Test rate is estimated
+    through prevalence study when randomly test a sample from the population to get the estimation of the
+    infected case and then use the confirmed case to derive the test rate.
+    We will assume that all death due to Covid19 has been tested and counted, so there is no extra uncertainty on the
+    number of death lower and upper bound.
+    For other metrics derive from death, we need to use this test rate to add uncertainty into their bounds.
+    Due to the definition, standard deviation of the derived metrics gets inflated by 1 over squareroot of test rate"""
     daily_predicted_death, daily_predicted_death_lb, daily_predicted_death_ub, model_beta  = \
             get_daily_predicted_death(local_death_data, forecast_horizon, lockdown_date,
-                                      relax_date, contain_rate, test_rate)
+                                      relax_date, contain_rate)
+    upper_length_death = daily_predicted_death_ub - daily_predicted_death
+    upper_length_derived = (upper_length_death*1/np.sqrt(test_rate)).astype('int', errors='ignore')
+    lower_length_death = daily_predicted_death - daily_predicted_death_lb
+    lower_length_derived = (lower_length_death * 1 / np.sqrt(test_rate)).astype('int', errors='ignore')
+
     daily_local_death_new = local_death_data.diff().fillna(0)
     daily_local_death_new.columns = ['death']
     daily_infected_cases_new = get_infected_cases(daily_predicted_death)
@@ -345,6 +358,13 @@ def get_daily_metrics_from_death_data(local_death_data, forecast_horizon=60, loc
     daily_hospitalized_cases_new = get_hospitalized_cases(daily_predicted_death)
     daily_hospital_beds_need = get_number_hospital_beds_need(daily_predicted_death)
     daily_ICU_need = get_number_ICU_need(daily_predicted_death)
+
+    # daily_infected_cases_new_lb = daily_infected_cases_new - get_infected_cases(lower_length_derived)
+    # daily_symptomatic_cases_new_lb = daily_symptomatic_cases_new - get_symptomatic_cases(lower_length_derived)
+    # daily_hospitalized_cases_new_lb = daily_hospitalized_cases_new - get_hospitalized_cases(lower_length_derived)
+    # daily_hospital_beds_need_lb = daily_hospital_beds_need - get_number_hospital_beds_need(lower_length_derived)
+    # daily_ICU_need_lb = daily_hospital_beds_need - get_number_ICU_need(lower_length_derived)
+
     return pd.concat([daily_local_death_new,
                       daily_predicted_death,
                       daily_predicted_death_lb,
