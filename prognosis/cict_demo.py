@@ -11,15 +11,15 @@ py_offline.__PLOTLY_OFFLINE_INITIALIZED = True
 
 import model_utils as mu
 
-mu.DEATH_RATE = 1.0
-mu.ICU_RATE = 5.0
-mu.HOSPITAL_RATE = 15.0
-mu.SYMPTOM_RATE = 20.0
-mu.INFECT_2_HOSPITAL_TIME = 12
-mu.HOSPITAL_2_ICU_TIME = 2
-mu.ICU_2_DEATH_TIME = 5
-mu.ICU_2_RECOVER_TIME = 11
-mu.NOT_ICU_DISCHARGE_TIME = 7
+mu.DEATH_RATE = 0.36
+mu.ICU_RATE = 0.78
+mu.HOSPITAL_RATE = 2.18
+mu.SYMPTOM_RATE = 10.2
+mu.INFECT_2_HOSPITAL_TIME = 11
+mu.HOSPITAL_2_ICU_TIME = 4
+mu.ICU_2_DEATH_TIME = 4
+mu.ICU_2_RECOVER_TIME = 7
+mu.NOT_ICU_DISCHARGE_TIME = 5
 
 st.title('C*apacity* I*ncidence* C*ontaining* T*esting* (CICT) Demo')
 hide_menu_style = """
@@ -91,8 +91,7 @@ st.plotly_chart(fig)
 
 log_fit, model_beta_log = mu.get_log_daily_predicted_death_by_state_US(state, lockdown_date='20200322',
                                                                        forecast_horizon=forecast_horizon,
-                                                                       relax_date=relax_date, contain_rate=contain_rate,
-                                                                       test_rate=test_rate)
+                                                                       relax_date=relax_date, contain_rate=contain_rate)
 st.subheader('Fitted log of incidences')
 log_fit.rename(columns={'predicted_death':'Predicted_Incidence', 'death': 'Incidence'}, inplace=True)
 fig = log_fit.drop(columns=['lower_bound', 'upper_bound', 'Incidence'], errors='ignore').iplot(asFigure=True)
