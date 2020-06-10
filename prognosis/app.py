@@ -28,12 +28,13 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 st.markdown('COVID-19:  The prognosis for next 2 months. '
             ' How many hospital beds or ICU needed? In every countries and US states. ')
 
-def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug, show_data,
+def main(scope, local, lockdown_date, relax_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug, show_data,
          back_test, last_data_date):
     data_load_state = st.text('Forecasting...')
     try:
         daily, cumulative, model_beta = forecast_fun(local,
                                                      forecast_horizon=forecast_horizon, lockdown_date=lockdown_date,
+                                                     relax_date=relax_date,
                                                      back_test=back_test, last_data_date=last_data_date)
     except ValueError:
         st.error('Not enough fatality data to provide prognosis, please check input and lockdown date')
@@ -133,7 +134,7 @@ def main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun,
 
     if show_debug:
         log_fit, _ = debug_fun(local, forecast_horizon=forecast_horizon, lockdown_date=lockdown_date,
-                               back_test=back_test, last_data_date=last_data_date)
+                               relax_date=relax_date, back_test=back_test, last_data_date=last_data_date)
         fig = log_fit.rename(columns={'death':'observed', 'predicted_death': 'predicted'})\
             .drop(columns=['lower_bound', 'upper_bound'], errors='ignore').iplot(asFigure=True)
         x = log_fit.index
@@ -315,12 +316,13 @@ else:
     forecast_fun = mu.get_metrics_by_state_US
     debug_fun = mu.get_log_daily_predicted_death_by_state_US
 
-
-
-'You selected: ', local, 'with lock down date: ', lockdown_date, '. Click **Run** on left sidebar to see forecast. Plot' \
-                                                                 ' is interactive. Work best on desktop.'
 forecast_horizon = st.sidebar.slider('Forecast Horizon', value=60, min_value=30, max_value=90)
 show_debug = st.sidebar.checkbox('Show fitted log death', value=True)
+relax_date=None
+if st.sidebar.checkbox('Add lockdown end date'):
+    relax_date = st.sidebar.date_input('when did lockdown end?', dt.date.today())
+'You selected: ', local, 'with lock down date: ', lockdown_date, ' and relax date ', relax_date,\
+    '. Click **Run** on left sidebar to see forecast. Plot is interactive. Work best on desktop.'
 show_data = st.sidebar.checkbox('Show raw output data')
 if st.sidebar.checkbox('Advance: change assumptions'):
     if st.sidebar.checkbox('Change rates'):
@@ -356,8 +358,8 @@ if back_test:
     'Run back test with data up to', last_data_date
 
 if st.sidebar.button('Run'):
-    main(scope, local, lockdown_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug,show_data,
-         back_test, last_data_date)
+    main(scope, local, lockdown_date, relax_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug,
+         show_data, back_test, last_data_date)
     model_params = [dt.datetime.today(), scope, local, lockdown_date, mu.DEATH_RATE, mu.ICU_RATE, mu.HOSPITAL_RATE,
                     mu.SYMPTOM_RATE, mu.INFECT_2_HOSPITAL_TIME, mu.HOSPITAL_2_ICU_TIME, mu.ICU_2_DEATH_TIME, 
                     mu.ICU_2_RECOVER_TIME, mu.NOT_ICU_DISCHARGE_TIME, back_test, last_data_date]
@@ -365,8 +367,8 @@ if st.sidebar.button('Run'):
 st.sidebar.subheader('Authors')
 st.sidebar.info(
 """
-Quoc Tran  
-Huong Huynh - Data Scientist - Virtual Power Systems - [LinkedIn](https://www.linkedin.com/in/huonghuynhsjsu) 
+Quoc Tran [LinkedIn](www.linkedin.com/in/quoc-tran-wml)  
+Huong Huynh [LinkedIn](https://www.linkedin.com/in/huonghuynhsjsu)  
 Feedback: hthuongsc@gmail.com  
 [Gibhub](https://github.com/QuocTran/COVID-19.git)  
 Data Source: [JHU](https://coronavirus.jhu.edu/map.html)
