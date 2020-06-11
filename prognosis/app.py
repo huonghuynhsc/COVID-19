@@ -370,7 +370,7 @@ st.sidebar.info(
 Quoc Tran [LinkedIn](www.linkedin.com/in/quoc-tran-wml)  
 Huong Huynh [LinkedIn](https://www.linkedin.com/in/huonghuynhsjsu)  
 Feedback: hthuongsc@gmail.com  
-[Gibhub](https://github.com/QuocTran/COVID-19.git)  
+Source Code: [Gibhub](https://github.com/QuocTran/COVID-19.git)  
 Data Source: [JHU](https://coronavirus.jhu.edu/map.html)
 """
 )
