@@ -596,3 +596,4 @@ if st.checkbox('Changelog'):
                 'now at 0.36%. All the other rates are changed accordingly. One extra bonus, our estimates on ICU and '
                 'hospital bed are in the same range with observed numbers now. ')
     st.markdown('2020/05/07 Added back test to visually evaluate model sensitivity to new data point')
+    st.markdown('2020/06/11 Added lock down end date which allows modeling the relax phase')
