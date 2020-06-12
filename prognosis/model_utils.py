@@ -78,7 +78,7 @@ def get_data_by_county_and_state(county, state, type='deaths'):
 
 
 def get_lockdown_date_global(csv_file='data/lockdown_date_country.csv'):
-    return pd.read_csv(csv_file)[['country', 'lockdown_date']].set_index('country')
+    return pd.read_csv(csv_file)[['country', 'lockdown_date', 'relax_date']].set_index('country')
 
 
 def get_lockdown_date_by_country(country):
@@ -90,8 +90,20 @@ def get_lockdown_date_by_country(country):
     return lockdown_date
 
 
+def get_relax_date_by_country(country):
+    try:
+        relax_date = pd.to_datetime(get_lockdown_date_global().loc[country][1])
+    except KeyError:
+        relax_date = dt.date.today()
+        #relax_date = None
+    if relax_date>pd.to_datetime('2020/01/01'):
+        return relax_date
+    else:
+        return dt.date.today()
+
+
 def get_lockdown_date_US(csv_file='data/lockdown_date_state_US.csv'):
-    return pd.read_csv(csv_file)[['state', 'lockdown_date']].set_index('state')
+    return pd.read_csv(csv_file)[['state', 'lockdown_date', 'relax_date']].set_index('state')
 
 
 def get_lockdown_date_by_state_US(state):
@@ -101,6 +113,18 @@ def get_lockdown_date_by_state_US(state):
         #lockdown_date = dt.date.today()
         lockdown_date = None
     return lockdown_date
+
+
+def get_relax_date_by_state_US(state):
+    try:
+        relax_date = pd.to_datetime(get_lockdown_date_US().loc[state][1])
+    except KeyError:
+        relax_date = dt.date.today()
+        #relax_date = None
+    if relax_date>pd.to_datetime('2020/01/01'):
+        return relax_date
+    else:
+        return dt.date.today()
 
 
 def get_daily_data(cum_data):

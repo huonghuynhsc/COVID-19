@@ -306,6 +306,7 @@ if scope=='Country':
                                           mu.get_lockdown_date_by_country(local))
     forecast_fun = mu.get_metrics_by_country
     debug_fun = mu.get_log_daily_predicted_death_by_country
+    relax_date_fun = mu.get_relax_date_by_country
 else:
     #data_load_state = st.text('Loading data...')
     death_data = mu.get_data(scope='US', type='deaths')
@@ -315,12 +316,14 @@ else:
                                           mu.get_lockdown_date_by_state_US(local))
     forecast_fun = mu.get_metrics_by_state_US
     debug_fun = mu.get_log_daily_predicted_death_by_state_US
+    relax_date_fun = mu.get_relax_date_by_state_US
 
 forecast_horizon = st.sidebar.slider('Forecast Horizon', value=60, min_value=30, max_value=90)
 show_debug = st.sidebar.checkbox('Show fitted log death', value=True)
 relax_date=None
 if st.sidebar.checkbox('Add lockdown end date'):
-    relax_date = st.sidebar.date_input('when did lockdown end?', dt.date.today())
+    relax_date = st.sidebar.date_input('when did lockdown end? Or significant policy change date?',
+                                       relax_date_fun(local))
 'You selected: ', local, 'with lock down date: ', lockdown_date, ' and relax date ', relax_date,\
     '. Click **Run** on left sidebar to see forecast. Plot is interactive. Work best on desktop.'
 show_data = st.sidebar.checkbox('Show raw output data')
@@ -360,7 +363,8 @@ if back_test:
 if st.sidebar.button('Run'):
     main(scope, local, lockdown_date, relax_date, forecast_horizon, forecast_fun, debug_fun, metrics, show_debug,
          show_data, back_test, last_data_date)
-    model_params = [dt.datetime.today(), scope, local, lockdown_date, mu.DEATH_RATE, mu.ICU_RATE, mu.HOSPITAL_RATE,
+    model_params = [dt.datetime.today(), scope, local, lockdown_date, relax_date,
+                    mu.DEATH_RATE, mu.ICU_RATE, mu.HOSPITAL_RATE,
                     mu.SYMPTOM_RATE, mu.INFECT_2_HOSPITAL_TIME, mu.HOSPITAL_2_ICU_TIME, mu.ICU_2_DEATH_TIME, 
                     mu.ICU_2_RECOVER_TIME, mu.NOT_ICU_DISCHARGE_TIME, back_test, last_data_date]
     mu.append_row_2_logs(model_params)

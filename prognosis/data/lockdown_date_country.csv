@@ -1,11 +1,11 @@
-country,lockdown_date,Note
-Albania,2020/03/13,Stay at home order
+country,lockdown_date,Note,relax_date
+Albania,2020/03/13,Stay at home order,2020/06/01
 Argentina,2020/03/20,Stay at home order
 Armenia,2020/03/24,
-Algeria,2020/03/20,Stay at home order
-Austria,2020/03/16,Stay at home order
+Algeria,2020/03/20,Stay at home order,2020/04/15
+Austria,2020/03/16,Stay at home order,2020/04/13
 Bangladesh,2020/03/31,
-Belgium,2020/03/22,Stay at home order
+Belgium,2020/03/22,Stay at home order,2020/05/04
 Bolivia,2020/03/22,
 Brazil,2020/03/24,
 Bulgaria,2020/03/15,Stay at home order
@@ -33,8 +33,8 @@ Greece,2020/03/23,Stay at home order
 Honduras,2020/03/27,
 Hungary,2020/03/28,Stay at home order
 India,2020/03/24,Stay at home order
-Iran,2020/02/27,Stay at home order
-Iraq,2020/03/22,
+Iran,2020/02/27,Stay at home order,2020/04/20
+Iraq,2020/03/22,,2020/04/11
 Ireland,2020/03/27,Stay at home order
 Israel,2020/03/30,
 Italy,2020/02/29,Stay at home order
