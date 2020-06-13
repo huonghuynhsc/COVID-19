@@ -220,6 +220,20 @@ def get_number_ICU_need(daily_local_death_new):
     return ICU_n
 
 
+def remove_outliers(log_daily_death, break_points):
+    """ Remove outliers by running robust linear regression in each section"""
+    robust_reg = linear_model.HuberRegressor(fit_intercept=True)
+    outliers = np.array([], dtype=bool)
+    for i in range(len(break_points)-1):
+        data_train = log_daily_death.query('time_idx>={}&time_idx<{}'.format(break_points[i], break_points[i+1]))
+        try:
+            robust_reg.fit(data_train.time_idx.values.reshape(-1, 1), data_train.death)
+            outliers_pw = robust_reg.outliers_
+        except:
+            outliers_pw = np.array([False] * len(data_train), dtype=bool)
+        outliers = np.concatenate((outliers, outliers_pw))
+    return log_daily_death[~outliers]
+
 def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, policy_change_dates=[], contain_rate=0.5):
     '''Since this is highly contagious disease. Daily new death, which is a proxy for daily new infected cases
     is model as d(t)=a*d(t-1) or equivalent to d(t) = b*a^(t). After a log transform, it becomes linear.
@@ -237,7 +251,6 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, policy_
     # Because of this smoothing step, we need to time var of prediction by smoothing_days=3.
     #shift ahead 1 day to avoid overfitted due to average of exponential value
     #daily_local_death_new = daily_local_death_new.shift(1)
-    #import pdb; pdb.set_trace()
     daily_local_death_new.columns = ['death']
     log_daily_death = np.log(daily_local_death_new)
     # log_daily_death.dropna(inplace=True)
@@ -255,14 +268,13 @@ def get_log_daily_predicted_death(local_death_data, forecast_horizon=60, policy_
     policy_effective_dates_idx = (policy_effective_dates - data_start_date).days.values
     log_daily_death['time_idx'] = data_time_idx
     log_daily_death = log_daily_death.replace([np.inf, -np.inf], np.nan).dropna()
-    regr_pw = pwlf.PiecewiseLinFit(x=log_daily_death.time_idx.values, y=log_daily_death.death)
     break_points = np.array([data_start_date_idx,] +
                             policy_effective_dates_idx[~np.isnan(policy_effective_dates_idx)].tolist() +
                             [forecast_end_date_idx,])
-    print(break_points)
+    log_daily_death = remove_outliers(log_daily_death, break_points)
+    regr_pw = pwlf.PiecewiseLinFit(x=log_daily_death.time_idx.values, y=log_daily_death.death)
     regr_pw.fit_with_breaks(break_points)
     model_beta = regr_pw.beta
-    print(model_beta)
 
     # log_daily_death_before = log_daily_death[log_daily_death.time_idx < 0]
     # regr_before = linear_model.HuberRegressor(fit_intercept=True)
