@@ -25,11 +25,11 @@ Egypt,2020/03/21,
 El Salvador,2020/03/15,Has relaxed on 0402
 Estonia,2020/03/27,Limit transportation
 Finland,2020/03/18,Educational facilities closed
-France,2020/03/16,Stay at home order
-Georgia,2020/03/31,
-Germany,2020/03/16,
+France,2020/03/16,Stay at home order,2020/05/11
+Georgia,2020/03/31,,2020/04/21
+Germany,2020/03/16,,2020/05/10
 Ghana,2020/03/30,
-Greece,2020/03/23,Stay at home order
+Greece,2020/03/23,Stay at home order,2020/05/04
 Honduras,2020/03/27,
 Hungary,2020/03/28,Stay at home order
 India,2020/03/24,Stay at home order
@@ -37,7 +37,7 @@ Iran,2020/02/27,Stay at home order,2020/04/20
 Iraq,2020/03/22,,2020/04/11
 Ireland,2020/03/27,Stay at home order
 Israel,2020/03/30,
-Italy,2020/02/29,Stay at home order
+Italy,2020/02/29,Stay at home order,2020/05/18
 Japan,2020/04/15,Stay at home order
 Kuwait,2020/03/29,
 Latvia,2020/03/12,Educational facilities closed
@@ -63,16 +63,16 @@ Serbia,2020/03/15,
 Singapore,2020/04/10,
 Slovakia,2020/03/12,Educational facilities closed
 Slovenia,2020/03/20,Stay at home order
-South Africa,2020/03/26,
-Spain,2020/03/05,Stay at home order
+South Africa,2020/03/26,,2020/04/30
+Spain,2020/03/05,Stay at home order,2020/05/09
 Sweden,2020/03/24,
 Switzerland,2020/03/15,Stay at home order
 Taiwan*,2020/03/11,
-Thailand,2020/03/25,
-Tunisia,2020/03/23,
-Turkey,2020/03/18,
-Ukraine,2020/03/17,
-United Arab Emirates,2020/03/26,
+Thailand,2020/03/25,,2020/05/31
+Tunisia,2020/03/23,,2020/04/19
+Turkey,2020/03/18,,2020/04/27
+Ukraine,2020/03/17,,2020/04/24
+United Arab Emirates,2020/03/26,,2020/04/17
 United Kingdom,2020/03/13,Stay at home order
 US,2020/03/17,
 Venezuela,2020/03/17,
